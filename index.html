@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBX — Cronograma de Transição</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1a3a2a;--leaf:#5aa06b;--mint:#8fca6b;--mist:#c8e8b8;--cream:#faf7f2;
+  --text-dark:#1a2215;--text-mid:#4a5940;
+  --river:#1a6080;--accent:#d4a843;
+  --s1bg:#d8f3dc;--s1tx:#1a5c30;--s2bg:#fff3cd;--s2tx:#8a5a00;--s3bg:#f0f0f0;--s3tx:#888;
+  --bar-done:#5aa06b;--bar-doing:#d4a843;--bar-not:#c8d8c8;--bar-tbd:#e0c8a8;
+
+  /* Section colours */
+  --c-cert:#1a6080; --c-imp:#2d7a55; --c-est:#6b4fa0; --c-plat:#b5601a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);font-size:13px;}
+.shell{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;flex-shrink:0;background:var(--forest);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;transition:width .25s;}
+.sidebar.col{width:50px;overflow:hidden;}
+.sidebar.col .sb-hide{display:none;}
+.sidebar.col .sb-logo{justify-content:center;padding:12px 0;}
+.sidebar.col .nav-item{justify-content:center;padding:10px 0;}
+.sidebar.col .toggle-btn{margin:0 auto;}
+.sb-logo{padding:18px 14px 12px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.sb-tag{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mint);margin-bottom:3px;}
+.sb-name{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.15;}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;}
+.toggle-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:15px;padding:3px 5px;border-radius:4px;transition:all .18s;flex-shrink:0;}
+.toggle-btn:hover{color:#fff;background:rgba(255,255,255,.1);}
+.sb-nav{padding:10px 0;flex:1;}
+.sb-sec{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.26);padding:10px 14px 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:500;color:rgba(255,255,255,.5);transition:all .14s;border-left:3px solid transparent;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.06);}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.1);border-left-color:var(--mint);font-weight:700;}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.nav-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-footer{padding:10px 14px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.2);line-height:1.6;}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;}
+.header{background:var(--forest);padding:24px 32px 20px;position:sticky;top:0;z-index:40;}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(143,202,107,.1) 0%,transparent 60%);pointer-events:none;}
+.header-inner{max-width:1400px;margin:0 auto;position:relative;}
+.h-tag{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--mint);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.h-tag::before{content:'';display:block;width:16px;height:1.5px;background:var(--mint);}
+.h-title{font-family:'Manrope',sans-serif;font-size:27px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:2px;}
+.h-sub{font-size:12px;color:rgba(255,255,255,.4);}
+.content{padding:22px 32px;max-width:1400px;margin:0 auto;}
+
+/* ── PROGRESS CARDS ── */
+.prog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:20px;}
+.prog-card{background:#fff;border-radius:12px;padding:16px 18px;border:1.5px solid var(--mist);position:relative;overflow:hidden;}
+.prog-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.prog-card[data-sec="cert"]::before{background:var(--c-cert);}
+.prog-card[data-sec="imp"]::before{background:var(--c-imp);}
+.prog-card[data-sec="est"]::before{background:var(--c-est);}
+.prog-card[data-sec="plat"]::before{background:var(--c-plat);}
+.prog-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.prog-lbl{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text-mid);margin-bottom:5px;}
+.prog-pct{font-family:'Manrope',sans-serif;font-size:30px;font-weight:800;color:var(--forest);line-height:1;}
+.prog-pct sup{font-size:14px;font-weight:600;}
+.prog-sub{font-size:10.5px;color:var(--text-mid);margin-top:2px;}
+.prog-icon{font-size:18px;opacity:.8;}
+.prog-track{height:4px;background:var(--mist);border-radius:4px;overflow:hidden;margin-top:10px;}
+.prog-fill{height:100%;border-radius:4px;transition:width .6s;}
+.prog-stats{display:flex;gap:10px;margin-top:7px;flex-wrap:wrap;}
+.prog-stat{font-size:10px;color:var(--text-mid);display:flex;align-items:center;gap:3px;}
+.prog-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ── SEARCH ── */
+.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.search-wrap{position:relative;flex:1;max-width:420px;}
+.search-input{width:100%;padding:8px 12px 8px 34px;border-radius:20px;border:1.5px solid var(--mist);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-dark);outline:none;transition:all .2s;}
+.search-input:focus{border-color:var(--leaf);box-shadow:0 0 0 3px rgba(90,160,107,.12);}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-mid);pointer-events:none;}
+.search-hint{font-size:11px;color:var(--text-mid);opacity:.7;}
+.clear-btn{background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-mid);padding:4px 8px;border-radius:8px;transition:all .15s;display:none;}
+.clear-btn:hover{background:var(--mist);}
+.clear-btn.visible{display:block;}
+
+/* ── LEGEND ── */
+.legend{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-mid);}
+.leg-bar{width:22px;height:7px;border-radius:2px;}
+
+/* ── GANTT BLOCK ── */
+.gantt-section{margin-bottom:20px;}
+.blk-header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px 10px 0 0;font-family:'Manrope',sans-serif;font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;cursor:pointer;user-select:none;color:#fff;}
+.blk-header[data-sec="cert"]{background:var(--c-cert);}
+.blk-header[data-sec="imp"]{background:var(--c-imp);}
+.blk-header[data-sec="est"]{background:var(--c-est);}
+.blk-header[data-sec="plat"]{background:var(--c-plat);}
+.blk-meta{font-size:10px;opacity:.6;font-weight:600;margin-left:2px;}
+.blk-toggle{margin-left:auto;font-size:11px;transition:transform .22s;opacity:.7;}
+.blk-toggle.open{transform:rotate(90deg);}
+.blk-body{display:none;border:1.5px solid var(--mist);border-top:none;border-radius:0 0 10px 10px;overflow:hidden;background:#fff;}
+.blk-body.open{display:block;}
+
+/* ── TABLE ── */
+.gantt-wrap{overflow-x:auto;}
+.gantt-table{width:100%;border-collapse:collapse;min-width:900px;}
+.gantt-table thead tr{background:#f5f9f5;border-bottom:2px solid var(--mist);}
+.gantt-table thead th{padding:8px 10px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-mid);text-align:left;white-space:nowrap;}
+.gantt-table tbody tr{border-bottom:1px solid #eff4ef;transition:background .1s;}
+.gantt-table tbody tr:hover{background:#f4fbf5;}
+.gantt-table tbody tr.hidden-row{display:none;}
+.gantt-table td{padding:6px 10px;vertical-align:middle;}
+
+/* Level visual styles */
+/* L1 = uppercase bold section headers (blk-header handles, no table rows) */
+/* L2 = bold */
+.gantt-table tr.lv2{background:#f0f8f1;}
+.gantt-table tr.lv2 .task-txt{font-weight:700;font-size:13px;}
+/* L3 = normal */
+.gantt-table tr.lv3 .task-txt{font-weight:400;font-size:12.5px;}
+/* L4 = italic */
+.gantt-table tr.lv4 .task-txt{font-style:italic;font-weight:400;font-size:12px;color:var(--text-mid);}
+
+/* Expand/collapse */
+.xbtn{flex-shrink:0;width:17px;height:17px;border-radius:3px;border:1.5px solid #d0e4d0;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-mid);transition:all .13s;line-height:1;}
+.xbtn:hover{background:var(--mist);border-color:var(--leaf);}
+.xbtn.open{background:var(--forest);border-color:var(--forest);color:#fff;}
+.no-x{flex-shrink:0;display:inline-block;width:17px;height:17px;}
+
+.task-cell{display:flex;align-items:center;gap:6px;}
+.ind-0{} /* L2 — no indent */
+.ind-1{padding-left:18px;} /* L3 */
+.ind-2{padding-left:36px;} /* L4 */
+
+.task-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+
+/* Badges */
+.proj-b{display:inline-block;padding:1px 7px;border-radius:9px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-awa{background:#d4edf5;color:#1a4a60;}
+.b-oga{background:#f0d8e8;color:#5a1a40;}
+.b-ahu{background:#d4f0d8;color:#1a5c30;}
+.b-tatuy{background:#f0ead4;color:#5a4a1a;}
+.b-angelim{background:#e8d4f0;color:#4a1a5c;}
+.b-ybyra{background:#fde8d4;color:#6b2d1a;}
+.b-hiwi{background:#d4e8f0;color:#1a3d5c;}
+.b-todos{background:#e8e8e8;color:#444;}
+.b-def{background:#f0f0f0;color:#666;}
+.resp-b{display:inline-block;padding:1px 8px;border-radius:9px;font-size:10px;font-weight:500;background:#edf5ed;color:var(--forest);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.stat-b{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:9px;font-size:10px;font-weight:700;white-space:nowrap;}
+.s-done{background:var(--s1bg);color:var(--s1tx);}
+.s-doing{background:var(--s2bg);color:var(--s2tx);}
+.s-not{background:var(--s3bg);color:var(--s3tx);}
+
+/* Bar */
+.bar-cell{position:relative;padding:3px 2px;}
+.gbar{position:absolute;top:50%;transform:translateY(-50%);height:12px;border-radius:3px;min-width:3px;opacity:.85;transition:opacity .13s;}
+.gbar:hover{opacity:1;}
+.gbar.done{background:var(--bar-done);}
+.gbar.doing{background:var(--bar-doing);}
+.gbar.not{background:var(--bar-not);}
+.gbar.tbd{background:var(--bar-tbd);opacity:.5;border:1.5px dashed #c8a06b;}
+.gbar.ms{width:9px!important;height:9px;border-radius:1px;transform:translateY(-50%) rotate(45deg);}
+
+.th-months{display:flex;width:100%;}
+.th-mo{flex:1;text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;border-left:1px solid var(--mist);padding:0 2px;}
+
+.empty-msg{padding:30px;text-align:center;color:var(--text-mid);font-size:13px;}
+
+/* Child row visibility */
+.gantt-table tr.child{display:none;}
+.gantt-table tr.child.vis{display:table-row;}
+
+/* ── OBJETIVO POPOVER ── */
+.obj-badge{
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;
+  background:#f0e8ff;border:1.5px solid #c4a8f0;
+  font-size:11px;cursor:pointer;
+  transition:all .15s;position:relative;
+  user-select:none;
+}
+.obj-badge:hover{background:#e0d0ff;border-color:#9b6ee0;transform:scale(1.1);}
+
+.obj-popover{
+  position:fixed;z-index:9999;
+  background:#fff;border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08);
+  border:1.5px solid #e8e0f8;
+  padding:14px 16px;max-width:340px;min-width:220px;
+  pointer-events:none;opacity:0;
+  transition:opacity .15s,transform .15s;
+  transform:translateY(4px);
+}
+.obj-popover.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+.obj-popover-header{
+  font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  color:#9b6ee0;margin-bottom:8px;display:flex;align-items:center;gap:6px;
+}
+.obj-popover-header::before{content:'🎯';}
+.obj-popover-text{
+  font-size:12.5px;line-height:1.65;color:#1a2215;
+}
+.obj-popover-arrow{
+  position:absolute;width:10px;height:10px;background:#fff;
+  border-left:1.5px solid #e8e0f8;border-top:1.5px solid #e8e0f8;
+  transform:rotate(45deg);
+}
+
+@media(max-width:760px){
+  .prog-grid{grid-template-columns:repeat(2,1fr);}
+  .content{padding:14px;}
+  .header{padding:16px 14px;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sb">
+  <div class="sb-logo">
+    <div class="sb-hide" style="flex:1;min-width:0">
+      <div class="sb-tag">Carbonext</div>
+      <div class="sb-name">Cronograma de Transição</div>
+      <div class="sb-sub">Visão Gantt · 2026</div>
+    </div>
+    <button class="toggle-btn" onclick="document.getElementById('sb').classList.toggle('col')">⇤</button>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec sb-hide">Seção</div>
+    <div class="nav-item active" onclick="fSec('ALL',this)">
+      <div class="nav-dot" style="background:var(--mint)"></div><span class="nav-txt sb-hide">Todas</span>
+    </div>
+    <div class="nav-item" onclick="fSec('cert',this)">
+      <div class="nav-dot" style="background:var(--c-cert)"></div><span class="nav-txt sb-hide">Certificação</span>
+    </div>
+    <div class="nav-item" onclick="fSec('imp',this)">
+      <div class="nav-dot" style="background:var(--c-imp)"></div><span class="nav-txt sb-hide">Finalização Impacto</span>
+    </div>
+    <div class="nav-item" onclick="fSec('est',this)">
+      <div class="nav-dot" style="background:var(--c-est)"></div><span class="nav-txt sb-hide">Estruturação</span>
+    </div>
+    <div class="nav-item" onclick="fSec('plat',this)">
+      <div class="nav-dot" style="background:var(--c-plat)"></div><span class="nav-txt sb-hide">Transição Plataforma</span>
+    </div>
+    <div class="sb-sec sb-hide">Projeto</div>
+    <div class="nav-item" onclick="fProj('Awa',this)"><div class="nav-dot b-awa" style="width:8px;height:8px;border-radius:50%"></div><span class="nav-txt sb-hide">Awa</span></div>
+    <div class="nav-item" onclick="fProj('Oga',this)"><div class="nav-dot" style="background:#d4a0c0"></div><span class="nav-txt sb-hide">Oga</span></div>
+    <div class="nav-item" onclick="fProj('Ahu',this)"><div class="nav-dot" style="background:#7ac87a"></div><span class="nav-txt sb-hide">Ahu</span></div>
+    <div class="nav-item" onclick="fProj('Tatuy',this)"><div class="nav-dot" style="background:#c8a860"></div><span class="nav-txt sb-hide">Tatuy</span></div>
+    <div class="nav-item" onclick="fProj('Angelim',this)"><div class="nav-dot" style="background:#b090d0"></div><span class="nav-txt sb-hide">Angelim</span></div>
+    <div class="nav-item" onclick="fProj('Ybyra',this)"><div class="nav-dot" style="background:#e0a880"></div><span class="nav-txt sb-hide">Ybyra</span></div>
+    <div class="nav-item" onclick="fProj('Hiwi',this)"><div class="nav-dot" style="background:#80b8d0"></div><span class="nav-txt sb-hide">Hiwi</span></div>
+  </div>
+  <div class="sb-footer sb-hide">CBX PMO · 2026</div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="header">
+    <div class="header-inner">
+      <div class="h-tag">Carbonext PMO</div>
+      <div class="h-title">Cronograma de Transição</div>
+      <div class="h-sub">Acompanhamento integrado — Gantt interativo · Jan–Ago 2026</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="prog-grid" id="prog-cards"></div>
+
+    <div class="ctrl-row">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="srch" type="text"
+          placeholder="Buscar tarefa, projeto ou responsável..."
+          oninput="onSearch(this.value)">
+      </div>
+      <button class="clear-btn" id="clear-btn" onclick="clearSearch()">✕ Limpar</button>
+      <span class="search-hint" id="srch-hint"></span>
+    </div>
+
+    <div class="legend">
+      <div class="leg-item"><div class="leg-bar" style="background:var(--bar-done)"></div>Concluído</div>
+      <div class="leg-item"><div class="leg-bar" style="background:var(--bar-doing)"></div>Em Andamento</div>
+      <div class="leg-item"><div class="leg-bar" style="background:var(--bar-not)"></div>Não Iniciado</div>
+      <div class="leg-item"><div class="leg-bar" style="background:var(--bar-tbd);border:1.5px dashed #c8a06b"></div>TBD</div>
+    </div>
+
+    <div id="gantt"></div>
+  </div>
+</main>
+</div>
+
+<!-- OBJETIVO POPOVER -->
+<div class="obj-popover" id="obj-popover">
+  <div class="obj-popover-header">Objetivo</div>
+  <div class="obj-popover-text" id="obj-popover-text"></div>
+  <div class="obj-popover-arrow" id="obj-popover-arrow"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════
+const MONTHS=[
+  {label:"Jan 26",month:0,year:2026,days:31},
+  {label:"Fev 26",month:1,year:2026,days:28},
+  {label:"Mar 26",month:2,year:2026,days:31},
+  {label:"Abr 26",month:3,year:2026,days:30},
+  {label:"Mai 26",month:4,year:2026,days:31},
+  {label:"Jun 26",month:5,year:2026,days:30},
+  {label:"Jul 26",month:6,year:2026,days:31},
+  {label:"Ago 26",month:7,year:2026,days:31},
+];
+const TL0=new Date(2026,0,1);
+const TL1=new Date(2026,7,31);
+const TL_DAYS=(TL1-TL0)/864e5;
+const TODAY=new Date();
+
+function pl(d){
+  if(!d||d==='TBD')return null;
+  const m=d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?new Date(+m[1],+m[2]-1,+m[3]):null;
+}
+function dayOff(d){
+  const dt=pl(d);
+  if(!dt)return null;
+  return Math.max(0,Math.min(TL_DAYS,(dt-TL0)/864e5));
+}
+function pct(n){return(n/TL_DAYS*100).toFixed(3)+'%';}
+function fmtD(d){
+  const dt=pl(d);
+  if(!dt)return'TBD';
+  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+}
+function todayPct(){
+  const d=dayOff(`${TODAY.getFullYear()}-${String(TODAY.getMonth()+1).padStart(2,'0')}-${String(TODAY.getDate()).padStart(2,'0')}`);
+  return d!==null?pct(d):null;
+}
+
+// ═══════════════════════════════════════════
+// DATA
+// lv: 2=bold, 3=normal, 4=italic
+// sec: cert | imp | est | plat
+// pk: parent grp key  grp: self key
+// ═══════════════════════════════════════════
+const T=[
+// ─── CERTIFICAÇÃO ───────────────────────────
+{r:4,  lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Awa",     resp:"-",              ini:"2026-01-28",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"c-Awa-4"},
+{r:5,  lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Awa",     resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Não Iniciado", pk:"c-Awa-4",  grp:"c-Awa-4"},
+
+{r:6,  lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-05-31",st:"Em Andamento",pk:"",          grp:"c-Oga-6"},
+{r:7,  lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Oga",     resp:"-",              ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-6",   grp:"c-Oga-7"},
+{r:8,  lv:4,sec:"cert",item:"Finding 10",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:9,  lv:4,sec:"cert",item:"Finding 23",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:10, lv:4,sec:"cert",item:"Finding 32",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:11, lv:4,sec:"cert",item:"Finding 38",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:12, lv:4,sec:"cert",item:"Finding 39",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:13, lv:4,sec:"cert",item:"Finding 20",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:14, lv:4,sec:"cert",item:"Finding 11",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:15, lv:4,sec:"cert",item:"Finding 19",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:16, lv:4,sec:"cert",item:"Finding 24",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:17, lv:4,sec:"cert",item:"Finding 27",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",   grp:"c-Oga-7"},
+{r:18, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Oga",     resp:"VVB",            ini:"2026-04-08",fim:"2026-04-22",st:"Não Iniciado", pk:"c-Oga-6",   grp:"c-Oga-6"},
+{r:19, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Oga",     resp:"Luiz",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Oga-6",   grp:"c-Oga-6"},
+{r:20, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Oga",     resp:"VVB",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Oga-6",   grp:"c-Oga-6"},
+{r:21, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Oga",     resp:"Verra",          ini:"2026-05-31",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Oga-6",   grp:"c-Oga-6"},
+
+{r:22, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"c-Tatuy-22"},
+{r:23, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Tatuy",   resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"c-Tatuy-22",grp:"c-Tatuy-22"},
+
+{r:24, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Ahu",     resp:"Andressa",       ini:"2026-02-11",fim:"2026-05-31",st:"Em Andamento",pk:"",          grp:"c-Ahu-24"},
+{r:25, lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Ahu",     resp:"-",              ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-24",  grp:"c-Ahu-25"},
+{r:26, lv:4,sec:"cert",item:"Finding 2",                      proj:"Ahu",     resp:"Raquel",         ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:27, lv:4,sec:"cert",item:"Finding 8.1",                    proj:"Ahu",     resp:"Raquel",         ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:28, lv:4,sec:"cert",item:"Finding 8.2",                    proj:"Ahu",     resp:"Raquel",         ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:29, lv:4,sec:"cert",item:"Finding 13",                     proj:"Ahu",     resp:"Fred",           ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:30, lv:4,sec:"cert",item:"Finding 14",                     proj:"Ahu",     resp:"Fred",           ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:31, lv:4,sec:"cert",item:"Finding 21",                     proj:"Ahu",     resp:"Andressa",       ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:32, lv:4,sec:"cert",item:"Finding 27",                     proj:"Ahu",     resp:"Je P.",          ini:"2026-03-19",fim:"2026-03-19",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:33, lv:4,sec:"cert",item:"Finding 28.1",                   proj:"Ahu",     resp:"Je P.",          ini:"2026-03-19",fim:"2026-03-19",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:34, lv:4,sec:"cert",item:"Finding 28.2",                   proj:"Ahu",     resp:"Fred",           ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",  grp:"c-Ahu-25"},
+{r:35, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ahu",     resp:"VVB",            ini:"2026-03-27",fim:"2026-04-22",st:"Em Andamento",pk:"c-Ahu-24",  grp:"c-Ahu-24"},
+{r:36, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ahu",     resp:"Luiz",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Ahu-24",  grp:"c-Ahu-24"},
+{r:37, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ahu",     resp:"VVB",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Ahu-24",  grp:"c-Ahu-24"},
+{r:38, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ahu",     resp:"Verra",          ini:"2026-05-31",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Ahu-24",  grp:"c-Ahu-24"},
+
+{r:39, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Angelim", resp:"Lorena",         ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"c-Ang-39"},
+{r:40, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Angelim", resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"c-Ang-39",  grp:"c-Ang-39"},
+
+{r:41, lv:2,sec:"cert",item:"Validação (PD)",                 proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-05-15",st:"Em Andamento",pk:"",          grp:"c-Yby-41"},
+{r:42, lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Ybyra",   resp:"-",              ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-41",  grp:"c-Yby-42"},
+{r:43, lv:4,sec:"cert",item:"Finding 2",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:44, lv:4,sec:"cert",item:"Finding 3",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:45, lv:4,sec:"cert",item:"Finding 13",                     proj:"Ybyra",   resp:"Raquel",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:46, lv:4,sec:"cert",item:"Finding 18",                     proj:"Ybyra",   resp:"Luan",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:47, lv:4,sec:"cert",item:"Finding 31",                     proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:48, lv:4,sec:"cert",item:"Finding 36",                     proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",  grp:"c-Yby-42"},
+{r:49, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ybyra",   resp:"VVB",            ini:"2026-04-13",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Yby-41",  grp:"c-Yby-41"},
+{r:50, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-04-17",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Yby-41",  grp:"c-Yby-41"},
+{r:51, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ybyra",   resp:"VVB",            ini:"2026-04-20",fim:"2026-04-20",st:"Não Iniciado", pk:"c-Yby-41",  grp:"c-Yby-41"},
+{r:52, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ybyra",   resp:"Verra",          ini:"2026-05-15",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Yby-41",  grp:"c-Yby-41"},
+
+{r:53, lv:2,sec:"cert",item:"Verificação (MR1)",              proj:"Ybyra",   resp:"Lorena",         ini:"2026-05-15",fim:"2026-08-31",st:"Em Andamento",pk:"",          grp:"c-Yby-53"},
+{r:54, lv:3,sec:"cert",item:"Ajustes ao MR1",                 proj:"Ybyra",   resp:"-",              ini:"2026-05-15",fim:"2026-06-12",st:"Não Iniciado", pk:"c-Yby-53",  grp:"c-Yby-53"},
+{r:55, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ybyra",   resp:"VVB",            ini:"2026-06-15",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",  grp:"c-Yby-53"},
+{r:56, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-06-26",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",  grp:"c-Yby-53"},
+{r:57, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ybyra",   resp:"VVB",            ini:"2026-06-29",fim:"2026-06-29",st:"Não Iniciado", pk:"c-Yby-53",  grp:"c-Yby-53"},
+{r:58, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ybyra",   resp:"Verra",          ini:"2026-06-29",fim:"2026-08-31",st:"Não Iniciado", pk:"c-Yby-53",  grp:"c-Yby-53"},
+
+{r:59, lv:2,sec:"cert",item:"Verificação - MR2",              proj:"Hiwi",    resp:"Ricarla",        ini:"2026-03-19",fim:"2026-04-10",st:"Em Andamento",pk:"",          grp:"c-Hiwi-59"},
+{r:60, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Hiwi",    resp:"Verra",          ini:"2026-03-19",fim:"2026-04-10",st:"Não Iniciado", pk:"c-Hiwi-59", grp:"c-Hiwi-59"},
+
+{r:61, lv:2,sec:"cert",item:"Verificação - MR3",              proj:"Hiwi",    resp:"Ricarla",        ini:"2026-04-10",fim:"2026-05-15",st:"Em Andamento",pk:"",          grp:"c-Hiwi-61"},
+{r:62, lv:3,sec:"cert",item:"Ajustes ao MR3",                 proj:"Hiwi",    resp:"-",              ini:"2026-04-10",fim:"2026-04-15",st:"Não Iniciado", pk:"c-Hiwi-61", grp:"c-Hiwi-61"},
+{r:63, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Hiwi",    resp:"VVB",            ini:"2026-04-15",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Hiwi-61", grp:"c-Hiwi-61"},
+{r:64, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Hiwi",    resp:"Luiz",           ini:"2026-04-17",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Hiwi-61", grp:"c-Hiwi-61"},
+{r:65, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Hiwi",    resp:"VVB",            ini:"2026-04-20",fim:"2026-04-20",st:"Não Iniciado", pk:"c-Hiwi-61", grp:"c-Hiwi-61"},
+{r:66, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Hiwi",    resp:"Verra",          ini:"2026-05-15",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Hiwi-61", grp:"c-Hiwi-61"},
+
+// ─── FINALIZAÇÃO IMPACTO (PARCERIA) ─────────
+{r:69, lv:2,sec:"imp",item:"Avaliação de Fechamento MR2",     proj:"Tatuy",   resp:"Jess Guin",      ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"",          grp:"i-Tatuy-69"},
+{r:70, lv:3,sec:"imp",item:"Validação de evidências recebidas",proj:"Tatuy",  resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Tatuy-69",grp:"i-Tatuy-69"},
+{r:71, lv:3,sec:"imp",item:"Avaliação de ações p/ fechamento",proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Tatuy-69",grp:"i-Tatuy-69"},
+
+{r:72, lv:2,sec:"imp",item:"Avaliação de Fechamento MR2",     proj:"Angelim", resp:"Jess Guin",      ini:"2026-04-02",fim:"2026-04-29",st:"Em Andamento",pk:"",          grp:"i-Ang-72"},
+{r:73, lv:3,sec:"imp",item:"Articulação com proprietário",    proj:"Angelim", resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-10",st:"Em Andamento",pk:"i-Ang-72",  grp:"i-Ang-72"},
+{r:74, lv:3,sec:"imp",item:"Validação de evidências recebidas",proj:"Angelim",resp:"Ricarla",        ini:"2026-04-10",fim:"2026-04-24",st:"Não Iniciado", pk:"i-Ang-72",  grp:"i-Ang-72"},
+{r:75, lv:3,sec:"imp",item:"Avaliação de ações p/ fechamento",proj:"Angelim", resp:"Ricarla",        ini:"2026-04-27",fim:"2026-04-29",st:"Não Iniciado", pk:"i-Ang-72",  grp:"i-Ang-72"},
+
+{r:76, lv:2,sec:"imp",item:"Definição de plano de transição de impacto",proj:"Todos",resp:"Jess Guin",ini:"2026-04-02",fim:"2026-04-16",st:"Em Andamento",pk:"",grp:"i-Ger-76"},
+{r:77, lv:3,sec:"imp",item:"Avaliação Hiwi",                  proj:"Hiwi",    resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",  grp:"i-Ger-76"},
+{r:78, lv:3,sec:"imp",item:"Avaliação Oga",                   proj:"Oga",     resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",  grp:"i-Ger-76"},
+{r:79, lv:3,sec:"imp",item:"Avaliação Tatuy",                 proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",  grp:"i-Ger-76"},
+{r:80, lv:3,sec:"imp",item:"Avaliação Ahu",                   proj:"Ahu",     resp:"Andressa",       ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",  grp:"i-Ger-76"},
+{r:81, lv:3,sec:"imp",item:"Avaliação Angelim",               proj:"Angelim", resp:"Lorena",         ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",  grp:"i-Ger-76"},
+{r:82, lv:3,sec:"imp",item:"Junção Quick Capture + Biodiversidade",proj:"-",  resp:"Priscilla",      ini:"2026-04-09",fim:"2026-04-16",st:"Não Iniciado", pk:"i-Ger-76",  grp:"i-Ger-76"},
+
+{r:83, lv:2,sec:"imp",item:"Implementação de ações remanescentes",proj:"Awa", resp:"Jess Guin",      ini:"2026-03-23",fim:"TBD",        st:"Em Andamento",pk:"",          grp:"i-Awa-83"},
+{r:84, lv:3,sec:"imp",item:"Apoio na manutenção de câmeras trap",proj:"Awa",  resp:"Priscilla",      ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-83",  grp:"i-Awa-84"},
+{r:85, lv:4,sec:"imp",item:"Acompanhar a instalação",         proj:"Awa",     resp:"Priscilla",      ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-84",  grp:"i-Awa-84"},
+{r:86, lv:4,sec:"imp",item:"Acompanhar solicitação de apoio", proj:"Awa",     resp:"Priscilla",      ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-84",  grp:"i-Awa-84"},
+{r:87, lv:4,sec:"imp",item:"Confirmar preenchimento de formulários",proj:"Awa",resp:"Priscilla",     ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-84",  grp:"i-Awa-84"},
+{r:88, lv:3,sec:"imp",item:"Implementação oficina de validação de coexistência",proj:"Awa",resp:"Priscilla",ini:"TBD",fim:"TBD",st:"Não Iniciado",pk:"i-Awa-83",grp:"i-Awa-83"},
+{r:89, lv:3,sec:"imp",item:"Manutenção de mecanismos de comunicação",proj:"Awa",resp:"Jess Guin",   ini:"2026-04-02",fim:"2026-06-30",st:"Em Andamento",pk:"i-Awa-83",  grp:"i-Awa-89"},
+{r:90, lv:4,sec:"imp",item:"Abril",                           proj:"Awa",     resp:"Jess Guin",      ini:"2026-04-02",fim:"2026-04-30",st:"Em Andamento",pk:"i-Awa-89",  grp:"i-Awa-89"},
+{r:91, lv:4,sec:"imp",item:"Maio",                            proj:"Awa",     resp:"Jess Guin",      ini:"2026-05-01",fim:"2026-05-31",st:"Não Iniciado", pk:"i-Awa-89",  grp:"i-Awa-89"},
+{r:92, lv:4,sec:"imp",item:"Junho",                           proj:"Awa",     resp:"Jess Guin",      ini:"2026-06-01",fim:"2026-06-30",st:"Não Iniciado", pk:"i-Awa-89",  grp:"i-Awa-89"},
+{r:93, lv:3,sec:"imp",item:"Estruturar laboratório de informática",proj:"Awa",resp:"Jess Guin",      ini:"2026-03-23",fim:"TBD",        st:"Em Andamento",pk:"i-Awa-83",  grp:"i-Awa-93"},
+{r:94, lv:4,sec:"imp",item:"Validação dos equipamentos a serem doados",proj:"Awa",resp:"Alice",      ini:"2026-03-23",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-93",  grp:"i-Awa-93"},
+{r:95, lv:4,sec:"imp",item:"Recebimento de plano de melhoria de infra.",proj:"Awa",resp:"Jess Guin",ini:"2026-04-06",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-93",  grp:"i-Awa-93"},
+{r:96, lv:4,sec:"imp",item:"Validação do plano de melhoria de infra",proj:"Awa",resp:"Jess Guin",   ini:"2026-04-10",fim:"2026-04-17",st:"Não Iniciado", pk:"i-Awa-93",  grp:"i-Awa-93"},
+{r:97, lv:4,sec:"imp",item:"Implementação de melhorias",      proj:"Awa",     resp:"Jess Guin",      ini:"2026-04-17",fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-93",  grp:"i-Awa-93"},
+{r:98, lv:3,sec:"imp",item:"Elaboração de Plano de Gestão de Recursos",proj:"Awa",resp:"Jess Guin",  ini:"2026-03-30",fim:"2026-06-29",st:"Em Andamento",pk:"i-Awa-83",  grp:"i-Awa-98"},
+{r:99, lv:4,sec:"imp",item:"Assinatura de contrato",          proj:"Awa",     resp:"Jess Guin",      ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-98",  grp:"i-Awa-98"},
+{r:100,lv:4,sec:"imp",item:"Análise prévia — suporte p/ plano",proj:"Awa",    resp:"Fabiano",        ini:"2026-04-10",fim:"2026-05-10",st:"Não Iniciado", pk:"i-Awa-98",  grp:"i-Awa-98"},
+{r:101,lv:4,sec:"imp",item:"Planejamento de logística p/ campo",proj:"Awa",   resp:"Jess Guin",      ini:"2026-04-10",fim:"2026-05-25",st:"Não Iniciado", pk:"i-Awa-98",  grp:"i-Awa-98"},
+{r:102,lv:4,sec:"imp",item:"Implementação das oficinas (mín. 3 dias)",proj:"Awa",resp:"Jess Guin",   ini:"2026-05-25",fim:"2026-05-29",st:"Não Iniciado", pk:"i-Awa-98",  grp:"i-Awa-98"},
+{r:103,lv:4,sec:"imp",item:"Recebimento do relatório",        proj:"Awa",     resp:"Jess Guin",      ini:"2026-05-29",fim:"2026-06-29",st:"Não Iniciado", pk:"i-Awa-98",  grp:"i-Awa-98"},
+{r:104,lv:3,sec:"imp",item:"Confirmação da instalação de placas",proj:"Awa",  resp:"Jess Guin",      ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-83",  grp:"i-Awa-83"},
+
+// ─── ESTRUTURAÇÃO DA TRANSIÇÃO ───────────────
+{r:107,lv:2,sec:"est",item:"Refinamento de produto e processos",proj:"Todos",  resp:"Alice",          ini:"2026-04-01",fim:"2026-05-31",st:"Em Andamento",pk:"",          grp:"e-107"},
+{r:108,lv:3,sec:"est",item:"Refinamento dos indicadores do menú",proj:"Todos", resp:"Jess Guin",      ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-107",     grp:"e-108", obj:"Refinar os indicadores aplicáveis de forma padronizada para cada um dos escopos, baseado no mapeamento feito com AI."},
+{r:109,lv:4,sec:"est",item:"Refinamento dos indicadores de Biodiversidade",proj:"Todos",resp:"Prisicilla",ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-108",grp:"e-108"},
+{r:110,lv:4,sec:"est",item:"Refinamento dos indicadores de Comunidade",proj:"Todos",resp:"Lorena",     ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-108",     grp:"e-108"},
+{r:111,lv:4,sec:"est",item:"Refinamento dos indicadores de Clima",proj:"Todos",resp:"Costa",           ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-108",     grp:"e-108"},
+{r:112,lv:3,sec:"est",item:"Estruturação de matriz de risco por atividade",proj:"Todos",resp:"Costa",  ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"e-107",     grp:"e-107", obj:"Criar um menú de possíveis riscos ambientais, sociais, reputacionais, etc., vinculados à execução de atividades de projeto, junto com ações de mitigação e controle, em resposta ao requisito do VCS 5.0."},
+{r:113,lv:3,sec:"est",item:"Revisão da matriz de risco dos projetos",proj:"Todos",resp:"Jess Guin",    ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-107",     grp:"e-113", obj:"Revisão e atualização da matriz de risco do projeto e estruturação do fluxo dentro da plataforma."},
+{r:114,lv:4,sec:"est",item:"Revisão da matriz do Ahu",        proj:"Ahu",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:115,lv:4,sec:"est",item:"Revisão da matriz do Angelim",    proj:"Angelim", resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:116,lv:4,sec:"est",item:"Revisão da matriz do Awa",        proj:"Awa",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:117,lv:4,sec:"est",item:"Revisão da matriz do Hiwi",       proj:"Hiwi",    resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:118,lv:4,sec:"est",item:"Revisão da matriz do Oga",        proj:"Oga",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:119,lv:4,sec:"est",item:"Revisão da matriz do Tatuy",      proj:"Tatuy",   resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:120,lv:4,sec:"est",item:"Revisão da matriz do Ybyra",      proj:"Ybyra",   resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-113",     grp:"e-113"},
+{r:121,lv:3,sec:"est",item:"Revisão canal comunicação e recebimento de queixas",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-107",grp:"e-121", obj:"Revisão do P.O. de canal de comunicação em resposta ao VCS 5.0, junto com uma proposta de fluxo para jornada do proprietário."},
+{r:122,lv:4,sec:"est",item:"Revisão e ajuste do P.O. do canal de comunicação",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-121",grp:"e-121"},
+{r:123,lv:4,sec:"est",item:"Construção de proposta de fluxo para jornada do proprietário",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-121",grp:"e-121"},
+{r:124,lv:3,sec:"est",item:"Refinamento da aplicação do menú aos projetos",proj:"Todos",resp:"Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-107",grp:"e-124", obj:"Validação da aplicação dos níveis baseada no mapeamento feito com AI, com o objetivo de ajustar e melhorar o fluxo de classificação e critérios de seleção de atividades para a plataforma."},
+{r:125,lv:4,sec:"est",item:"Validação escopos de Biodiversidade",proj:"Todos",resp:"Prisicilla",        ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-124",     grp:"e-124"},
+{r:126,lv:4,sec:"est",item:"Validação escopos de Comunidade",proj:"Todos",    resp:"Lorena",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-124",     grp:"e-124"},
+{r:127,lv:4,sec:"est",item:"Validação escopos de Clima",      proj:"Todos",    resp:"Costa",             ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-124",     grp:"e-124"},
+{r:128,lv:4,sec:"est",item:"Definição de ajustes no fluxo de classificação e seleção",proj:"Todos",resp:"Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-124",grp:"e-124"},
+{r:129,lv:3,sec:"est",item:"Definição de fluxo de implementação de atividades",proj:"Todos",resp:"Lana, Mari",ini:"2026-04-03",fim:"2026-04-17",st:"Em Andamento",pk:"e-107",grp:"e-107", obj:"Construção de jornada do proprietário facilitando a implementação de ações e coleta de evidências."},
+{r:130,lv:3,sec:"est",item:"Adequação à VM0048",              proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-107",     grp:"e-130", obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação da VM0048, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
+{r:131,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"Mari",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-130",grp:"e-130"},
+{r:132,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-130",     grp:"e-130"},
+{r:133,lv:4,sec:"est",item:"Construção de processo de quantificação VM0048",proj:"Todos",resp:"Luan",    ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-130",     grp:"e-130"},
+{r:134,lv:4,sec:"est",item:"Construção de processo de requantificação VM0048",proj:"Todos",resp:"Luan",  ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-130",     grp:"e-130"},
+{r:135,lv:3,sec:"est",item:"Adequação à VCS 5.0",             proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-107",     grp:"e-135", obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação do VCS 5.0, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
+{r:136,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"Mari",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-135",grp:"e-135"},
+{r:137,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-135",     grp:"e-135"},
+{r:138,lv:3,sec:"est",item:"Adequação à Conservation Standards 5.0",proj:"Todos",resp:"Jess Guin",      ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-107",     grp:"e-138", obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação do CS 5.0, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
+{r:139,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"TBD",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-138",grp:"e-138"},
+{r:140,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"TBD",               ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-138",     grp:"e-138"},
+
+{r:141,lv:2,sec:"est",item:"Estruturar transição para EqE do piloto Awa",proj:"Todos",resp:"Jess Guin",  ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"",          grp:"e-141"},
+{r:142,lv:3,sec:"est",item:"Definição do processo e cronograma de transição",proj:"Todos",resp:"Mari",   ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"e-141",     grp:"e-141"},
+{r:143,lv:3,sec:"est",item:"Acompanhamento do Feasibility Review",proj:"Todos",resp:"Jess Guin",        ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"e-141",     grp:"e-141"},
+{r:144,lv:3,sec:"est",item:"Acompanhamento do Design Review",proj:"Todos",    resp:"Jess Guin",          ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"e-141",     grp:"e-141"},
+{r:145,lv:3,sec:"est",item:"Acompanhamento do Envio para CP",proj:"Todos",    resp:"Jess Guin",          ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"e-141",     grp:"e-141"},
+{r:146,lv:3,sec:"est",item:"Acompanhamento do VVB Review",    proj:"Todos",    resp:"Jess Guin",          ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"e-141",     grp:"e-141"},
+
+// ─── TRANSIÇÃO PARA PLATAFORMA ───────────────
+{r:149,lv:2,sec:"plat",item:"Construção do material de onboarding",proj:"Todos",resp:"Lana",            ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"p-149", obj:"Construção de material dinâmico que facilite o processo de onboarding para a equipe do Proprietário."},
+{r:150,lv:3,sec:"plat",item:"O que é REDD?",                  proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"p-149",     grp:"p-149"},
+{r:151,lv:3,sec:"plat",item:"Comportamento em campo",         proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"p-149",     grp:"p-149"},
+{r:152,lv:3,sec:"plat",item:"Regras VCS e CCB (evidências)",  proj:"Todos",    resp:"Lana, Andressa, Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-149",grp:"p-149"},
+{r:153,lv:3,sec:"plat",item:"Compliance",                     proj:"Todos",    resp:"Lana, Andressa, Juridico",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-149",grp:"p-149"},
+{r:154,lv:3,sec:"plat",item:"Riscos",                         proj:"Todos",    resp:"Lana, Andressa, Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-149",grp:"p-149"},
+{r:155,lv:3,sec:"plat",item:"Canal de Comunicação",           proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-149",     grp:"p-149"},
+
+{r:156,lv:2,sec:"plat",item:"Treinamento da equipe",          proj:"Todos",    resp:"TBD",               ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"",          grp:"p-156"},
+{r:157,lv:3,sec:"plat",item:"Estruturação de cronograma de implementação dos treinamentos",proj:"Todos",resp:"TBD",ini:"TBD",fim:"TBD",st:"Não Iniciado",pk:"p-156",grp:"p-156"},
+
+{r:158,lv:2,sec:"plat",item:"Implementação",                  proj:"Todos",    resp:"TBD",               ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"",          grp:"p-158"},
+{r:159,lv:2,sec:"plat",item:"Acompanhamento",                 proj:"Todos",    resp:"TBD",               ini:"TBD",       fim:"TBD",        st:"Não Iniciado", pk:"",          grp:"p-159"},
+];
+
+// ═══════════════════════════════════════════
+// SECTIONS CONFIG
+// ═══════════════════════════════════════════
+const SECS=[
+  {sec:"cert", icon:"🏅", label:"Certificação VCS/CCB"},
+  {sec:"imp",  icon:"🌱", label:"Finalização Impacto (Parceria)"},
+  {sec:"est",  icon:"⚙️", label:"Estruturação da Transição"},
+  {sec:"plat", icon:"🚀", label:"Transição para Plataforma"},
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let aSec='ALL', aProj='ALL', srchQ='';
+const EXP=new Set();
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function pCls(p){
+  return({awa:'b-awa',oga:'b-oga',ahu:'b-ahu',tatuy:'b-tatuy',angelim:'b-angelim',ybyra:'b-ybyra',hiwi:'b-hiwi',todos:'b-todos'}[(p||'').toLowerCase()])||'b-def';
+}
+function sCls(s){return s==='Concluído'?'s-done':s==='Em Andamento'?'s-doing':'s-not';}
+function sEmoji(s){return s==='Concluído'?'✅':s==='Em Andamento'?'🟡':'⚪';}
+function bCls(s){return s==='Concluído'?'done':s==='Em Andamento'?'doing':'not';}
+
+// ═══════════════════════════════════════════
+// PROGRESS CARDS
+// ═══════════════════════════════════════════
+function renderProg(){
+  document.getElementById('prog-cards').innerHTML=SECS.map(d=>{
+    const bt=T.filter(t=>t.sec===d.sec);
+    const dn=bt.filter(t=>t.st==='Concluído').length;
+    const dg=bt.filter(t=>t.st==='Em Andamento').length;
+    const ni=bt.filter(t=>t.st==='Não Iniciado').length;
+    const tot=bt.length, p=tot?Math.round(dn/tot*100):0;
+    return`<div class="prog-card" data-sec="${d.sec}">
+      <div class="prog-top">
+        <div><div class="prog-lbl">${d.label}</div>
+          <div class="prog-pct">${p}<sup>%</sup></div>
+          <div class="prog-sub">${dn} de ${tot} concluídas</div>
+        </div>
+        <div class="prog-icon">${d.icon}</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" style="width:${p}%;background:var(--c-${d.sec})"></div></div>
+      <div class="prog-stats">
+        <div class="prog-stat"><div class="prog-dot" style="background:var(--bar-done)"></div>${dn} concluídas</div>
+        <div class="prog-stat"><div class="prog-dot" style="background:var(--bar-doing)"></div>${dg} em andamento</div>
+        <div class="prog-stat"><div class="prog-dot" style="background:#bbb"></div>${ni} não iniciadas</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// BUILD TABLE
+// ═══════════════════════════════════════════
+const MHDR=MONTHS.map(m=>`<div class="th-mo" style="flex:${m.days}">${m.label}</div>`).join('');
+const TP=todayPct();
+
+function buildTable(tasks){
+  let rows='';
+  const today_div=TP?`<div style="position:absolute;top:0;bottom:0;left:${TP};width:1.5px;background:rgba(192,57,43,.45);pointer-events:none;z-index:3"></div>`:'';
+
+  const grpsWithKids=new Set(tasks.map(t=>t.pk).filter(pk=>pk!==''));
+  for(const t of tasks){
+    const isChild=t.pk!=='';
+    // hasKids: another row in tasks must have pk===t.grp AND be a true child (lv > t.lv, not a sibling)
+    const hasKids=tasks.some(c=>c.pk===t.grp&&c.r!==t.r&&c.lv>t.lv);
+    const selfExp=EXP.has(t.grp);
+    const parentExp=t.pk===''||EXP.has(t.pk);
+
+    let trCls=`lv${t.lv}`;
+    if(isChild){trCls+=' child';if(parentExp)trCls+=' vis';}
+    if(selfExp&&hasKids)trCls+=' expanded';
+
+    const xBtn=hasKids
+      ?`<button class="xbtn${selfExp?' open':''}" onclick="toggleX(event,'${t.grp}')">${selfExp?'−':'+'}</button>`
+      :`<span class="no-x"></span>`;
+
+    const ind=t.lv-2; // lv2→ind-0, lv3→ind-1, lv4→ind-2
+    const pb=(t.proj&&t.proj!=='-')?`<span class="proj-b ${pCls(t.proj)}">${t.proj}</span>`:'';
+    const resp_disp=t.resp&&t.resp!=='-'?t.resp:'—';
+    const objBadge=t.obj?`<button class="obj-badge" onclick="showObj(event,'${t.obj.replace(/'/g,"&#39;")}')" title="Ver objetivo">🎯</button>`:'';
+
+    // Bar
+    const s=dayOff(t.ini),e=dayOff(t.fim);
+    let bar='';
+    if(s!==null&&e!==null){
+      const ms=t.ini===t.fim;
+      bar=`<div class="gbar ${bCls(t.st)}${ms?' ms':''}" style="left:calc(${pct(s)} + 2px);width:${ms?'9px':`calc(${pct(Math.max(0.5,e-s))} - 4px)`}" title="${t.item}: ${fmtD(t.ini)} → ${fmtD(t.fim)}"></div>`;
+    } else {
+      bar=`<div class="gbar tbd" style="left:8%;width:11%" title="TBD — ${t.item}"></div>`;
+    }
+
+    rows+=`<tr class="${trCls}" data-grp="${t.grp}" data-pk="${t.pk}" data-sec="${t.sec}" data-proj="${t.proj}" data-resp="${t.resp}" data-item="${t.item.toLowerCase()}">
+      <td class="ind-${Math.max(0,ind)}" style="min-width:310px;max-width:310px">
+        <div class="task-cell">${xBtn}<span class="task-txt" title="${t.item}">${t.item}</span>${objBadge}</div>
+      </td>
+      <td style="min-width:76px">${pb}</td>
+      <td style="min-width:110px"><span class="resp-b" title="${t.resp}">${resp_disp}</span></td>
+      <td style="min-width:66px;font-size:11px;color:var(--text-mid)">${fmtD(t.ini)}</td>
+      <td style="min-width:66px;font-size:11px;color:var(--text-mid)">${fmtD(t.fim)}</td>
+      <td style="min-width:108px"><span class="stat-b ${sCls(t.st)}">${sEmoji(t.st)} ${t.st||'—'}</span></td>
+      <td class="bar-cell" style="position:relative;width:100%;min-width:280px">${today_div}${bar}</td>
+    </tr>`;
+  }
+
+  return`<div class="gantt-wrap"><table class="gantt-table">
+    <thead><tr>
+      <th style="min-width:310px">Tarefa</th>
+      <th>Projeto</th><th>Responsável</th><th>Início</th><th>Fim</th><th>Status</th>
+      <th><div class="th-months">${MHDR}</div></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER BLOCKS
+// ═══════════════════════════════════════════
+function renderBlocks(filtered){
+  let html='';
+  for(const d of SECS){
+    const bt=filtered.filter(t=>t.sec===d.sec);
+    if(!bt.length) continue;
+    const open=aSec==='ALL'||aSec===d.sec;
+    const macros=bt.filter(t=>t.lv===2&&t.pk==='').length;
+    html+=`<div class="gantt-section">
+      <div class="blk-header" data-sec="${d.sec}" onclick="toggleBlk(this)">
+        ${d.icon} ${d.label}
+        <span class="blk-meta">(${macros} macros · ${bt.length} tarefas)</span>
+        <span class="blk-toggle${open?' open':''}">▶</span>
+      </div>
+      <div class="blk-body${open?' open':''}">
+        ${buildTable(bt)}
+      </div>
+    </div>`;
+  }
+  document.getElementById('gantt').innerHTML=html||`<div class="empty-msg">Nenhuma tarefa encontrada para "${srchQ}".</div>`;
+}
+
+// ═══════════════════════════════════════════
+// TOGGLE EXPAND
+// ═══════════════════════════════════════════
+function toggleX(e,grp){
+  e.stopPropagation();
+  const open=EXP.has(grp);
+  if(open){EXP.delete(grp);}else{EXP.add(grp);}
+  const btn=e.currentTarget;
+  btn.classList.toggle('open',!open);
+  btn.textContent=open?'+':'−';
+  btn.closest('tr').classList.toggle('expanded',!open);
+  document.querySelectorAll(`tr.child[data-pk="${grp}"]`).forEach(r=>{
+    r.classList.toggle('vis',!open);
+    if(open){// collapse grandchildren too
+      const cg=r.dataset.grp;
+      if(EXP.has(cg)){
+        EXP.delete(cg);
+        document.querySelectorAll(`tr.child[data-pk="${cg}"]`).forEach(gc=>gc.classList.remove('vis'));
+        const xb=r.querySelector('.xbtn');
+        if(xb){xb.classList.remove('open');xb.textContent='+';}
+        r.classList.remove('expanded');
+      }
+    }
+  });
+}
+
+function toggleBlk(hdr){
+  hdr.nextElementSibling.classList.toggle('open');
+  hdr.querySelector('.blk-toggle').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════
+function fSec(sec,el){
+  aSec=sec; aProj='ALL';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el?.classList.add('active');
+  applyF();
+}
+function fProj(proj,el){
+  aProj=proj; aSec='ALL';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el?.classList.add('active');
+  applyF();
+}
+
+function onSearch(val){
+  srchQ=val.trim().toLowerCase();
+  document.getElementById('clear-btn').classList.toggle('visible', srchQ.length>0);
+  applyF();
+}
+function clearSearch(){
+  document.getElementById('srch').value='';
+  onSearch('');
+}
+
+function applyF(){
+  let base=T.filter(t=>{
+    if(aSec!=='ALL'&&t.sec!==aSec) return false;
+    if(aProj!=='ALL'&&t.proj!==aProj) return false;
+    if(srchQ){
+      const hay=[t.item,t.proj,t.resp,t.st].join(' ').toLowerCase();
+      if(!hay.includes(srchQ)) return false;
+    }
+    return true;
+  });
+
+  // Add ancestor rows so hierarchy is preserved — only ancestors of direct matches
+  if(srchQ||aProj!=='ALL'){
+    // findParent: the parent of row t is the row where grp===t.pk AND lv < t.lv
+    function findParent(child){
+      return T.find(a=>a.grp===child.pk&&a.lv<child.lv);
+    }
+    const seen=new Set(base.map(t=>t.r));
+    const extras=[];
+    for(const t of base){
+      let cur=t;
+      while(cur.pk!==''){
+        const par=findParent(cur);
+        if(!par) break;
+        if(!seen.has(par.r)){extras.push(par);seen.add(par.r);}
+        cur=par;
+      }
+    }
+    base=[...extras,...base];
+    const ord=Object.fromEntries(T.map((t,i)=>[t.r,i]));
+    base.sort((a,b)=>ord[a.r]-ord[b.r]);
+    // Deduplicate by r
+    const uniq=[];const seenR=new Set();
+    for(const t of base){if(!seenR.has(t.r)){uniq.push(t);seenR.add(t.r);}}
+    base=uniq;
+  }
+
+  // Update hint
+  const hint=document.getElementById('srch-hint');
+  hint.textContent=srchQ&&base.length?`${base.length} resultado${base.length!==1?'s':''}`:
+    srchQ&&!base.length?'Nenhum resultado':'';
+
+  renderBlocks(base);
+}
+
+// ═══════════════════════════════════════════
+// OBJETIVO POPOVER
+// ═══════════════════════════════════════════
+let popoverOpen=false;
+let activeObjBtn=null;
+
+function showObj(e,text){
+  e.stopPropagation();
+  const pop=document.getElementById('obj-popover');
+  const arrow=document.getElementById('obj-popover-arrow');
+
+  // If same button clicked again → toggle off
+  if(activeObjBtn===e.currentTarget&&popoverOpen){
+    hideObj();
+    return;
+  }
+
+  activeObjBtn=e.currentTarget;
+  document.getElementById('obj-popover-text').textContent=text;
+  pop.classList.remove('visible');
+
+  // Position: calculate where to place
+  const rect=e.currentTarget.getBoundingClientRect();
+  const pw=340, ph=120; // approx popover dimensions
+  const vw=window.innerWidth, vh=window.innerHeight;
+
+  let top, left, arrowSide;
+
+  // Prefer below, fallback above
+  if(rect.bottom+ph+12<vh){
+    top=rect.bottom+8;
+    arrowSide='top';
+  } else {
+    top=rect.top-ph-8;
+    arrowSide='bottom';
+  }
+
+  // Horizontal: center on button, clamp to viewport
+  left=rect.left+rect.width/2-pw/2;
+  left=Math.max(12,Math.min(left,vw-pw-12));
+
+  pop.style.top=top+'px';
+  pop.style.left=left+'px';
+  pop.style.width=pw+'px';
+
+  // Arrow position
+  const arrowLeft=rect.left+rect.width/2-left-5;
+  arrow.style.left=Math.max(10,Math.min(arrowLeft,pw-20))+'px';
+
+  if(arrowSide==='top'){
+    arrow.style.top='-6px';
+    arrow.style.bottom='';
+    arrow.style.borderLeft='1.5px solid #e8e0f8';
+    arrow.style.borderTop='1.5px solid #e8e0f8';
+    arrow.style.borderRight='none';
+    arrow.style.borderBottom='none';
+    arrow.style.transform='rotate(45deg)';
+  } else {
+    arrow.style.bottom='-6px';
+    arrow.style.top='';
+    arrow.style.borderRight='1.5px solid #e8e0f8';
+    arrow.style.borderBottom='1.5px solid #e8e0f8';
+    arrow.style.borderLeft='none';
+    arrow.style.borderTop='none';
+    arrow.style.transform='rotate(45deg)';
+  }
+
+  pop.classList.add('visible');
+  popoverOpen=true;
+}
+
+function hideObj(){
+  document.getElementById('obj-popover').classList.remove('visible');
+  popoverOpen=false;
+  activeObjBtn=null;
+}
+
+// Close on outside click or scroll
+document.addEventListener('click',e=>{
+  if(popoverOpen&&!document.getElementById('obj-popover').contains(e.target)&&!e.target.classList.contains('obj-badge')){
+    hideObj();
+  }
+});
+document.addEventListener('scroll',hideObj,true);
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderProg();
+renderBlocks(T);
+</script>
+</body>
+</html>
