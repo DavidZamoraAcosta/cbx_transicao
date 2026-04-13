@@ -222,6 +222,77 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
   transform:rotate(45deg);
 }
 
+/* ── RESUMO MODAL ── */
+.resumo-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 20px;border-radius:20px;border:none;cursor:pointer;
+  background:var(--forest);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.3px;transition:all .18s;box-shadow:0 2px 8px rgba(26,58,42,.25);
+}
+.resumo-btn:hover{background:#2a5a3a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,58,42,.35);}
+
+.resumo-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.resumo-overlay.visible{opacity:1;pointer-events:auto;}
+
+.resumo-modal{
+  background:#fff;border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:min(680px,94vw);max-height:82vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  transform:translateY(20px) scale(.97);
+  transition:transform .22s;
+}
+.resumo-overlay.visible .resumo-modal{transform:translateY(0) scale(1);}
+
+.resumo-header{
+  background:var(--forest);padding:20px 24px 16px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  position:relative;flex-shrink:0;
+}
+.resumo-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(143,202,107,.15) 0%,transparent 60%);pointer-events:none;}
+.resumo-title{font-family:'Manrope',sans-serif;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px;position:relative;}
+.resumo-subtitle{font-size:11px;color:rgba(255,255,255,.45);margin-top:3px;position:relative;}
+.resumo-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.5);font-size:20px;line-height:1;padding:2px 6px;border-radius:6px;transition:all .15s;position:relative;}
+.resumo-close:hover{background:rgba(255,255,255,.12);color:#fff;}
+
+.resumo-body{overflow-y:auto;padding:20px 24px 24px;flex:1;}
+.resumo-section{margin-bottom:20px;}
+.resumo-section:last-child{margin-bottom:0;}
+.resumo-sec-title{
+  font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.resumo-sec-title::after{content:'';flex:1;height:1px;background:currentColor;opacity:.15;}
+.rs-green{color:#1a6b30;}
+.rs-amber{color:#8a5a00;}
+.rs-blue {color:#1a4a80;}
+
+.resumo-item{
+  display:flex;gap:10px;margin-bottom:8px;line-height:1.55;font-size:13px;color:#1a2215;
+}
+.resumo-item:last-child{margin-bottom:0;}
+.resumo-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.resumo-item b{font-weight:700;}
+.resumo-item .sub{font-size:12px;color:#5a6a55;margin-top:2px;}
+
+.resumo-marcos{
+  background:#f8faf6;border:1px solid #d0e8d0;border-radius:10px;
+  padding:12px 16px;margin-top:8px;
+}
+.resumo-marco-row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid #e8f0e8;font-size:12.5px;}
+.resumo-marco-row:last-child{border-bottom:none;}
+.rmr-date{font-weight:700;color:var(--forest);min-width:80px;font-size:11.5px;}
+.rmr-proj{font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;flex-shrink:0;}
+.rmr-hot{background:#fff0c0;color:#7a4500;border:1px solid #e8c840;}
+.rmr-ok {background:#d8f3dc;color:#1a5c30;}
+.rmr-warn{background:#fff3cd;color:#8a5a00;}
+
 @media(max-width:760px){
   .prog-grid{grid-template-columns:repeat(2,1fr);}
   .content{padding:14px;}
@@ -283,6 +354,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 
   <div class="content">
     <div class="prog-grid" id="prog-cards"></div>
+
+    <!-- RESUMO BUTTON -->
+    <div style="display:flex;justify-content:center;margin:-4px 0 20px">
+      <button class="resumo-btn" onclick="toggleResumo()">📋 Resumo da Semana</button>
+    </div>
 
     <div class="ctrl-row">
       <div class="search-wrap">
@@ -363,28 +439,36 @@ function todayPct(){
 // ═══════════════════════════════════════════
 const T=[
 // ─── CERTIFICAÇÃO ───────────────────────────
-{r:4,  lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Awa",     resp:"-",              ini:"2026-01-28",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"c-Awa-4"},
-{r:5,  lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Awa",     resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Não Iniciado", pk:"c-Awa-4",   grp:"c-Awa-4"},
+{r:4,  lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Awa",     resp:"-",              ini:"2026-04-07",fim:"2026-04-30",st:"Em Andamento",pk:"",          grp:"c-Awa-4"},
+{r:5,  lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",         proj:"Awa",     resp:"Andressa",          ini:"2026-04-13",fim:"2026-04-24",st:"Em Andamento", pk:"c-Awa-4",   grp:"c-Awa-4"},
+{r:301,lv:3,sec:"cert",item:"Ajuste de documento",                   proj:"Awa",     resp:"Andressa",    ini:"2026-04-07",fim:"2026-04-13",st:"Concluído",    pk:"c-Awa-4",    grp:"c-Awa-4"},
+{r:303,lv:3,sec:"cert",item:"Acompanhar confirmação da validação",    proj:"Awa",     resp:"Andressa",    ini:"2026-04-24",fim:"2026-04-30",st:"Não Iniciado", pk:"c-Awa-4",    grp:"c-Awa-4"},
 
 {r:6,  lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-05-31",st:"Em Andamento",pk:"",           grp:"c-Oga-6"},
 {r:7,  lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Oga",     resp:"-",              ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-6",    grp:"c-Oga-7"},
-{r:8,  lv:4,sec:"cert",item:"Finding 10",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-07",st:"Concluído",    pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:8,  lv:4,sec:"cert",item:"Finding 10",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",    pk:"c-Oga-7",    grp:"c-Oga-7"},
 {r:9,  lv:4,sec:"cert",item:"Finding 23",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-07",st:"Concluído",    pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:10, lv:4,sec:"cert",item:"Finding 32",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:11, lv:4,sec:"cert",item:"Finding 38",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-07",st:"Concluído",    pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:12, lv:4,sec:"cert",item:"Finding 39",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:13, lv:4,sec:"cert",item:"Finding 20",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:14, lv:4,sec:"cert",item:"Finding 11",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-07",st:"Concluído",    pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:15, lv:4,sec:"cert",item:"Finding 19",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:16, lv:4,sec:"cert",item:"Finding 24",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:17, lv:4,sec:"cert",item:"Finding 27",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
-{r:18, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Oga",     resp:"VVB",            ini:"2026-04-08",fim:"2026-04-22",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
-{r:19, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Oga",     resp:"Luiz",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
-{r:20, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Oga",     resp:"VVB",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
-{r:21, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Oga",     resp:"Verra",          ini:"2026-05-31",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
+{r:10, lv:4,sec:"cert",item:"Finding 32",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Concluído",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:11, lv:4,sec:"cert",item:"Finding 38",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",    pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:12, lv:4,sec:"cert",item:"Finding 39",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:13, lv:4,sec:"cert",item:"Finding 20",                     proj:"Oga",     resp:"Mari A.",        ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:14, lv:4,sec:"cert",item:"Finding 11",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",    pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:15, lv:4,sec:"cert",item:"Finding 19",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-15",st:"Em Andamento",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:16, lv:4,sec:"cert",item:"Finding 24",                     proj:"Oga",     resp:"Fred",           ini:"2026-03-30",fim:"2026-04-08",st:"Concluído",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:17, lv:4,sec:"cert",item:"Finding 27",                     proj:"Oga",     resp:"Ricarla",        ini:"2026-03-30",fim:"2026-04-08",st:"Concluído",pk:"c-Oga-7",    grp:"c-Oga-7"},
+{r:18, lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",           proj:"Oga",     resp:"Ricarla",            ini:"2026-04-08",fim:"2026-04-22",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
+{r:19, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Oga",     resp:"Ricarla",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
+{r:20, lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",             proj:"Oga",     resp:"Ricarla",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
+{r:21, lv:3,sec:"cert",item:"Acompanhar confirmação da validação",         proj:"Oga",     resp:"Ricarla",          ini:"2026-04-24",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Oga-6",    grp:"c-Oga-6"},
 
-{r:22, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"",           grp:"c-Tatuy-22"},
+{r:22, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-23",fim:"2026-06-30",st:"Em Andamento",pk:"",           grp:"c-Tatuy-22"},
 {r:23, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Tatuy",   resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:319,lv:3,sec:"cert",item:"Acompanhar o retorno (Nova rodada)",    proj:"Tatuy",   resp:"Ricarla",     ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:320,lv:3,sec:"cert",item:"Envio dos findings ao VVB",             proj:"Tatuy",   resp:"Ricarla",     ini:"2026-04-23",fim:"2026-05-07",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:321,lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",                  proj:"Tatuy",   resp:"Ricarla",     ini:"2026-05-07",fim:"2026-05-19",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:322,lv:3,sec:"cert",item:"Revisão ValR e VerR",                   proj:"Tatuy",   resp:"Luiz",        ini:"2026-05-19",fim:"2026-05-20",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:323,lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",         proj:"Tatuy",   resp:"Ricarla",     ini:"2026-05-20",fim:"2026-05-22",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
+{r:324,lv:3,sec:"cert",item:"Acompanhar confirmação da validação",   proj:"Tatuy",   resp:"Ricarla",     ini:"2026-06-30",fim:"2026-06-30",st:"Não Iniciado", pk:"c-Tatuy-22", grp:"c-Tatuy-22"},
 
 {r:24, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Ahu",     resp:"Andressa",       ini:"2026-02-11",fim:"2026-05-31",st:"Em Andamento",pk:"",           grp:"c-Ahu-24"},
 {r:25, lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Ahu",     resp:"-",              ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-24",   grp:"c-Ahu-25"},
@@ -397,129 +481,141 @@ const T=[
 {r:32, lv:4,sec:"cert",item:"Finding 27",                     proj:"Ahu",     resp:"Je P.",          ini:"2026-03-19",fim:"2026-03-19",st:"Concluído",    pk:"c-Ahu-25",   grp:"c-Ahu-25"},
 {r:33, lv:4,sec:"cert",item:"Finding 28.1",                   proj:"Ahu",     resp:"Je P.",          ini:"2026-03-19",fim:"2026-03-19",st:"Concluído",    pk:"c-Ahu-25",   grp:"c-Ahu-25"},
 {r:34, lv:4,sec:"cert",item:"Finding 28.2",                   proj:"Ahu",     resp:"Fred",           ini:"2026-02-11",fim:"2026-03-27",st:"Concluído",    pk:"c-Ahu-25",   grp:"c-Ahu-25"},
-{r:35, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ahu",     resp:"VVB",            ini:"2026-03-27",fim:"2026-04-22",st:"Em Andamento",pk:"c-Ahu-24",   grp:"c-Ahu-24"},
+{r:35, lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",           proj:"Ahu",     resp:"Andressa",            ini:"2026-03-27",fim:"2026-04-22",st:"Em Andamento",pk:"c-Ahu-24",   grp:"c-Ahu-24"},
 {r:36, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ahu",     resp:"Luiz",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Ahu-24",   grp:"c-Ahu-24"},
-{r:37, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ahu",     resp:"VVB",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Ahu-24",   grp:"c-Ahu-24"},
-{r:38, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ahu",     resp:"Verra",          ini:"2026-05-31",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Ahu-24",   grp:"c-Ahu-24"},
+{r:37, lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",             proj:"Ahu",     resp:"Andressa",            ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Ahu-24",   grp:"c-Ahu-24"},
+{r:38, lv:3,sec:"cert",item:"Acompanhar o retorno (Nova rodada)",         proj:"Ahu",     resp:"Andressa",          ini:"2026-05-31",fim:"2026-05-31",st:"Não Iniciado", pk:"c-Ahu-24",   grp:"c-Ahu-24"},
 
-{r:39, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Angelim", resp:"Lorena",         ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"",           grp:"c-Ang-39"},
+{r:39, lv:2,sec:"cert",item:"Validação e Verificação",        proj:"Angelim", resp:"Lorena",         ini:"2026-04-23",fim:"2026-06-30",st:"Em Andamento",pk:"",           grp:"c-Ang-39"},
 {r:40, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Angelim", resp:"Verra",          ini:"2026-04-30",fim:"2026-04-30",st:"Em Andamento",pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:339,lv:3,sec:"cert",item:"Acompanhar o retorno (Nova rodada)",    proj:"Angelim", resp:"Lorena",      ini:"2026-04-24",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:340,lv:3,sec:"cert",item:"Envio dos findings ao VVB",             proj:"Angelim", resp:"Lorena",      ini:"2026-04-23",fim:"2026-05-07",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:341,lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",                  proj:"Angelim", resp:"Lorena",      ini:"2026-05-07",fim:"2026-05-19",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:342,lv:3,sec:"cert",item:"Revisão ValR e VerR",                   proj:"Angelim", resp:"Luiz",        ini:"2026-05-19",fim:"2026-05-20",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:343,lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",         proj:"Angelim", resp:"Lorena",      ini:"2026-05-20",fim:"2026-05-22",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
+{r:344,lv:3,sec:"cert",item:"Acompanhar confirmação da validação",   proj:"Angelim", resp:"Lorena",      ini:"2026-06-30",fim:"2026-06-30",st:"Não Iniciado", pk:"c-Ang-39",   grp:"c-Ang-39"},
 
 {r:41, lv:2,sec:"cert",item:"Validação (PD)",                 proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-05-15",st:"Em Andamento",pk:"",           grp:"c-Yby-41"},
 {r:42, lv:3,sec:"cert",item:"Resposta ao VVB",                proj:"Ybyra",   resp:"-",              ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-41",   grp:"c-Yby-42"},
-{r:43, lv:4,sec:"cert",item:"Finding 2",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",   grp:"c-Yby-42"},
-{r:44, lv:4,sec:"cert",item:"Finding 3",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",   grp:"c-Yby-42"},
+{r:43, lv:4,sec:"cert",item:"Finding 2",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",pk:"c-Yby-42",   grp:"c-Yby-42"},
+{r:44, lv:4,sec:"cert",item:"Finding 3",                      proj:"Ybyra",   resp:"Fred",           ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",pk:"c-Yby-42",   grp:"c-Yby-42"},
 {r:45, lv:4,sec:"cert",item:"Finding 13",                     proj:"Ybyra",   resp:"Raquel",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",   grp:"c-Yby-42"},
-{r:46, lv:4,sec:"cert",item:"Finding 18",                     proj:"Ybyra",   resp:"Luan",           ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"c-Yby-42",   grp:"c-Yby-42"},
+{r:46, lv:4,sec:"cert",item:"Finding 18",                     proj:"Ybyra",   resp:"Luan",           ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",pk:"c-Yby-42",   grp:"c-Yby-42"},
 {r:47, lv:4,sec:"cert",item:"Finding 31",                     proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",   grp:"c-Yby-42"},
 {r:48, lv:4,sec:"cert",item:"Finding 36",                     proj:"Ybyra",   resp:"Lorena",         ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",    pk:"c-Yby-42",   grp:"c-Yby-42"},
-{r:49, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ybyra",   resp:"VVB",            ini:"2026-04-13",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
-{r:50, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-04-17",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
-{r:51, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ybyra",   resp:"VVB",            ini:"2026-04-20",fim:"2026-04-20",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
-{r:52, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ybyra",   resp:"Verra",          ini:"2026-05-15",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
+{r:49, lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",           proj:"Ybyra",   resp:"Lorena",            ini:"2026-04-13",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
+{r:50, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-04-22",fim:"2026-04-23",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
+{r:51, lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",             proj:"Ybyra",   resp:"Lorena",            ini:"2026-04-23",fim:"2026-04-27",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
+{r:52, lv:3,sec:"cert",item:"Acompanhar confirmação da validação",         proj:"Ybyra",   resp:"Lorena",          ini:"2026-04-27",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Yby-41",   grp:"c-Yby-41"},
 
 {r:53, lv:2,sec:"cert",item:"Verificação (MR1)",              proj:"Ybyra",   resp:"Lorena",         ini:"2026-05-15",fim:"2026-08-31",st:"Em Andamento",pk:"",           grp:"c-Yby-53"},
-{r:54, lv:3,sec:"cert",item:"Ajustes ao MR1",                 proj:"Ybyra",   resp:"-",              ini:"2026-05-15",fim:"2026-06-12",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
-{r:55, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Ybyra",   resp:"VVB",            ini:"2026-06-15",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
-{r:56, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-06-26",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
-{r:57, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Ybyra",   resp:"VVB",            ini:"2026-06-29",fim:"2026-06-29",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
-{r:58, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Ybyra",   resp:"Verra",          ini:"2026-06-29",fim:"2026-08-31",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
+{r:54, lv:3,sec:"cert",item:"Coordenar os ajustes ao MR1",                 proj:"Ybyra",   resp:"Lorena",              ini:"2026-05-15",fim:"2026-06-12",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
+{r:55, lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",           proj:"Ybyra",   resp:"Lorena",            ini:"2026-06-15",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
+{r:56, lv:3,sec:"cert",item:"Revisão VerR",            proj:"Ybyra",   resp:"Luiz",           ini:"2026-06-26",fim:"2026-06-26",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
+{r:57, lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",             proj:"Ybyra",   resp:"Lorena",            ini:"2026-06-29",fim:"2026-06-29",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
+{r:58, lv:3,sec:"cert",item:"Acompanhar confirmação da validação",         proj:"Ybyra",   resp:"Lorena",          ini:"2026-06-29",fim:"2026-08-31",st:"Não Iniciado", pk:"c-Yby-53",   grp:"c-Yby-53"},
 
-{r:59, lv:2,sec:"cert",item:"Verificação - MR2",              proj:"Hiwi",    resp:"Ricarla",        ini:"2026-03-19",fim:"2026-04-10",st:"Em Andamento",pk:"",           grp:"c-Hiwi-59"},
-{r:60, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Hiwi",    resp:"Verra",          ini:"2026-03-19",fim:"2026-04-10",st:"Não Iniciado", pk:"c-Hiwi-59",  grp:"c-Hiwi-59"},
+{r:59, lv:2,sec:"cert",item:"Verificação - MR2",              proj:"Hiwi",    resp:"Ricarla",        ini:"2026-03-19",fim:"2026-04-24",st:"Em Andamento",pk:"",           grp:"c-Hiwi-59"},
+{r:60, lv:3,sec:"cert",item:"Acompanhar confirmação da verificação",         proj:"Hiwi",    resp:"Ricarla",          ini:"2026-03-19",fim:"2026-04-10",st:"Concluído", pk:"c-Hiwi-59",  grp:"c-Hiwi-59"},
+{r:444,lv:3,sec:"cert",item:"Acompanhar submissão para o Verra",proj:"Hiwi",    resp:"Ricarla",     ini:"2026-04-13",fim:"2026-04-13",st:"Em Andamento",    pk:"c-Hiwi-59",  grp:"c-Hiwi-59"},
+{r:445,lv:3,sec:"cert",item:"Envio da resposta da 3R do PRR para o VVB",     proj:"Hiwi",    resp:"Ricarla",     ini:"2026-04-13",fim:"2026-04-14",st:"Concluído",pk:"c-Hiwi-59",  grp:"c-Hiwi-59"},
+{r:446,lv:3,sec:"cert",item:"Acompanhar confirmação de Verificação", proj:"Hiwi",    resp:"Ricarla",     ini:"2026-04-14",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Hiwi-59",  grp:"c-Hiwi-59"},
 
 {r:61, lv:2,sec:"cert",item:"Verificação - MR3",              proj:"Hiwi",    resp:"Ricarla",        ini:"2026-04-10",fim:"2026-05-15",st:"Em Andamento",pk:"",           grp:"c-Hiwi-61"},
-{r:62, lv:3,sec:"cert",item:"Ajustes ao MR3",                 proj:"Hiwi",    resp:"-",              ini:"2026-04-10",fim:"2026-04-15",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
-{r:63, lv:3,sec:"cert",item:"Technical Review VVB",           proj:"Hiwi",    resp:"VVB",            ini:"2026-04-15",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
-{r:64, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Hiwi",    resp:"Luiz",           ini:"2026-04-17",fim:"2026-04-17",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
-{r:65, lv:3,sec:"cert",item:"Submissão ao Verra",             proj:"Hiwi",    resp:"VVB",            ini:"2026-04-20",fim:"2026-04-20",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
-{r:66, lv:3,sec:"cert",item:"Expectativa de retorno",         proj:"Hiwi",    resp:"Verra",          ini:"2026-05-15",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
+{r:62, lv:3,sec:"cert",item:"Coordenar os ajustes ao MR3",                 proj:"Hiwi",    resp:"Ricarla",              ini:"2026-04-10",fim:"2026-04-15",st:"Em Andamento", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
+{r:63, lv:3,sec:"cert",item:"Acompanhar Technical Review VVB",           proj:"Hiwi",    resp:"Ricarla",            ini:"2026-04-20",fim:"2026-04-24",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
+{r:64, lv:3,sec:"cert",item:"Revisão ValR e VerR",            proj:"Hiwi",    resp:"Luiz",           ini:"2026-04-27",fim:"2026-04-29",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
+{r:65, lv:3,sec:"cert",item:"Acompanhar submissão ao Verra",             proj:"Hiwi",    resp:"Ricarla",            ini:"2026-04-29",fim:"2026-05-01",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
+{r:66, lv:3,sec:"cert",item:"Acompanhar confirmação da validação",         proj:"Hiwi",    resp:"Ricarla",          ini:"2026-05-15",fim:"2026-05-15",st:"Não Iniciado", pk:"c-Hiwi-61",  grp:"c-Hiwi-61"},
 
 // ─── FINALIZAÇÃO IMPACTO (PARCERIA) ─────────
 {r:69, lv:2,sec:"imp",item:"Avaliação de Fechamento MR2",     proj:"Tatuy",   resp:"Jess Guin",      ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"",           grp:"i-Tatuy-69"},
-{r:70, lv:3,sec:"imp",item:"Validação de evidências recebidas",proj:"Tatuy",  resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Tatuy-69", grp:"i-Tatuy-69"},
-{r:71, lv:3,sec:"imp",item:"Avaliação de ações p/ fechamento",proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Tatuy-69", grp:"i-Tatuy-69"},
+{r:70, lv:3,sec:"imp",item:"Validação de evidências recebidas",proj:"Tatuy",  resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",    pk:"i-Tatuy-69", grp:"i-Tatuy-69"},
+{r:71, lv:3,sec:"imp",item:"Avaliação de ações necessárias para fechamento",proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",    pk:"i-Tatuy-69", grp:"i-Tatuy-69"},
 
-{r:72, lv:2,sec:"imp",item:"Avaliação de Fechamento MR2",     proj:"Angelim", resp:"Jess Guin",      ini:"2026-04-02",fim:"2026-04-29",st:"Em Andamento",pk:"",           grp:"i-Ang-72"},
-{r:73, lv:3,sec:"imp",item:"Articulação com proprietário",    proj:"Angelim", resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-10",st:"Em Andamento",pk:"i-Ang-72",   grp:"i-Ang-72"},
+{r:72, lv:2,sec:"imp",item:"Avaliação de Fechamento MR2",     proj:"Angelim", resp:"Jess Guin",      ini:"2026-04-10",fim:"2026-05-08",st:"Em Andamento",pk:"",           grp:"i-Ang-72"},
+{r:73, lv:3,sec:"imp",item:"Articulação com proprietário",    proj:"Angelim", resp:"Lorena",        ini:"2026-04-13",fim:"2026-04-24",st:"Em Andamento",pk:"i-Ang-72",   grp:"i-Ang-72"},
 {r:74, lv:3,sec:"imp",item:"Validação de evidências recebidas",proj:"Angelim",resp:"Ricarla",        ini:"2026-04-10",fim:"2026-04-24",st:"Não Iniciado", pk:"i-Ang-72",   grp:"i-Ang-72"},
 {r:75, lv:3,sec:"imp",item:"Avaliação de ações p/ fechamento",proj:"Angelim", resp:"Ricarla",        ini:"2026-04-27",fim:"2026-04-29",st:"Não Iniciado", pk:"i-Ang-72",   grp:"i-Ang-72"},
+{r:370,lv:3,sec:"imp",item:"Validação de evidências recebidas",      proj:"Angelim", resp:"Lorena",     ini:"2026-04-27",fim:"2026-05-01",st:"Não Iniciado", pk:"i-Ang-72",   grp:"i-Ang-72"},
+{r:371,lv:3,sec:"imp",item:"Avaliação de ações necessárias para fechamento",       proj:"Angelim", resp:"Lorena",      ini:"2026-05-04",fim:"2026-05-08",st:"Não Iniciado", pk:"i-Ang-72",   grp:"i-Ang-72"},
 
-{r:76, lv:2,sec:"imp",item:"Definição de plano de transição de impacto",proj:"Todos",resp:"Jess Guin",ini:"2026-04-02",fim:"2026-04-16",st:"Em Andamento",pk:"",grp:"i-Ger-76"},
-{r:77, lv:3,sec:"imp",item:"Avaliação Hiwi",                  proj:"Hiwi",    resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",   grp:"i-Ger-76"},
-{r:78, lv:3,sec:"imp",item:"Avaliação Oga",                   proj:"Oga",     resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",   grp:"i-Ger-76"},
-{r:79, lv:3,sec:"imp",item:"Avaliação Tatuy",                 proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",   grp:"i-Ger-76"},
-{r:80, lv:3,sec:"imp",item:"Avaliação Ahu",                   proj:"Ahu",     resp:"Andressa",       ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",   grp:"i-Ger-76"},
-{r:81, lv:3,sec:"imp",item:"Avaliação Angelim",               proj:"Angelim", resp:"Lorena",         ini:"2026-04-02",fim:"2026-04-08",st:"Em Andamento",pk:"i-Ger-76",   grp:"i-Ger-76"},
-{r:82, lv:3,sec:"imp",item:"Junção Quick Capture + Biodiversidade",proj:"-",  resp:"Priscilla",      ini:"2026-04-09",fim:"2026-04-16",st:"Não Iniciado", pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:76, lv:2,sec:"imp",item:"Definição de plano de transição de impacto",proj:"Todos",resp:"Jess Guin",ini:"2026-04-02",fim:"2026-04-17",st:"Em Andamento",pk:"",grp:"i-Ger-76"},
+{r:77, lv:3,sec:"imp",item:"Avaliação Hiwi",                  proj:"Hiwi",    resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:78, lv:3,sec:"imp",item:"Avaliação Oga",                   proj:"Oga",     resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:79, lv:3,sec:"imp",item:"Avaliação Tatuy",                 proj:"Tatuy",   resp:"Ricarla",        ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:80, lv:3,sec:"imp",item:"Avaliação Ahu",                   proj:"Ahu",     resp:"Andressa",       ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:81, lv:3,sec:"imp",item:"Avaliação Angelim",               proj:"Angelim", resp:"Lorena",         ini:"2026-04-02",fim:"2026-04-08",st:"Concluído",pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:82, lv:3,sec:"imp",item:"Junção Quick Capture + Biodiversidade",proj:"-",  resp:"Priscilla",      ini:"2026-04-09",fim:"2026-04-17",st:"Em Andamento", pk:"i-Ger-76",   grp:"i-Ger-76"},
+{r:450,lv:3,sec:"imp",item:"Estimativa de custo logístico p/ implementação",proj:"Awa",resp:"Jess Guin",ini:"2026-04-13",fim:"2026-04-17",st:"Não Iniciado", pk:"i-Ger-76",   grp:"i-Ger-76"},
 
-{r:83, lv:2,sec:"imp",item:"Implementação de ações remanescentes",proj:"Awa", resp:"Jess Guin",      ini:"2026-03-23",fim:"TBD",        st:"Em Andamento",pk:"",           grp:"i-Awa-83"},
+{r:83, lv:2,sec:"imp",item:"Implementação de ações remanescentes",proj:"Awa", resp:"Jess Guin",      ini:"2026-03-23",fim:"2026-06-30",        st:"Em Andamento",pk:"",           grp:"i-Awa-83"},
 {r:84, lv:3,sec:"imp",item:"Entrega de insumos para roça sem fogo",proj:"Ybyra",resp:"Lorena",        ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-83",  grp:"i-Awa-83"},
 {r:85, lv:3,sec:"imp",item:"Apoio na manutenção de câmeras trap",proj:"Awa",  resp:"Priscila",        ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-83",  grp:"i-Awa-85"},
-{r:86, lv:4,sec:"imp",item:"Acompanhar a instalação",         proj:"Awa",     resp:"Priscila",        ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
-{r:87, lv:4,sec:"imp",item:"Acompanhar solicitação de apoio", proj:"Awa",     resp:"Priscila",        ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
-{r:88, lv:4,sec:"imp",item:"Confirmar preenchimento de formulários",proj:"Awa",resp:"Priscila",       ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
+{r:86, lv:4,sec:"imp",item:"Acompanhar a instalação",         proj:"Awa",     resp:"Priscila",        ini:"2026-06-01",        fim:"2026-06-30",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
+{r:87, lv:4,sec:"imp",item:"Acompanhar a solicitação de apoio para a instalação das câmeras", proj:"Awa",     resp:"Priscila",        ini:"2026-06-01",        fim:"2026-06-30",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
+{r:88, lv:4,sec:"imp",item:"Confirmar preenchimento de formulários",proj:"Awa",resp:"Priscila",       ini:"TBD",        fim:"2026-06-30",        st:"Não Iniciado", pk:"i-Awa-85",  grp:"i-Awa-85"},
 {r:89, lv:3,sec:"imp",item:"Implementação oficina de validação de coexistência",proj:"Awa",resp:"Priscila",ini:"TBD",fim:"TBD",st:"Não Iniciado",pk:"i-Awa-83",grp:"i-Awa-83"},
 {r:90, lv:3,sec:"imp",item:"Manutenção de mecanismos de comunicação",proj:"Awa",resp:"Jess Guin",    ini:"2026-04-02",fim:"2026-06-30",st:"Em Andamento",pk:"i-Awa-83",   grp:"i-Awa-90"},
-{r:91, lv:4,sec:"imp",item:"Abril",                           proj:"Awa",     resp:"Jess Guin",       ini:"2026-04-02",fim:"2026-04-30",st:"Em Andamento",pk:"i-Awa-90",   grp:"i-Awa-90"},
-{r:92, lv:4,sec:"imp",item:"Maio",                            proj:"Awa",     resp:"Jess Guin",       ini:"2026-05-01",fim:"2026-05-31",st:"Não Iniciado", pk:"i-Awa-90",   grp:"i-Awa-90"},
-{r:93, lv:4,sec:"imp",item:"Junho",                           proj:"Awa",     resp:"Jess Guin",       ini:"2026-06-01",fim:"2026-06-30",st:"Não Iniciado", pk:"i-Awa-90",   grp:"i-Awa-90"},
+{r:91, lv:4,sec:"imp",item:"Pagamento de Mecanismos de Comunicação (Abril)",                           proj:"Awa",     resp:"Andressa",       ini:"2026-04-02",fim:"2026-04-30",st:"Em Andamento",pk:"i-Awa-90",   grp:"i-Awa-90"},
+{r:92, lv:4,sec:"imp",item:"Pagamento de Mecanismos de Comunicação (Maio)",                            proj:"Awa",     resp:"Andressa",       ini:"2026-05-01",fim:"2026-05-31",st:"Não Iniciado", pk:"i-Awa-90",   grp:"i-Awa-90"},
+{r:93, lv:4,sec:"imp",item:"Pagamento de Mecanismos de Comunicação (Junho)",                           proj:"Awa",     resp:"Andressa",       ini:"2026-06-01",fim:"2026-06-30",st:"Não Iniciado", pk:"i-Awa-90",   grp:"i-Awa-90"},
 {r:94, lv:3,sec:"imp",item:"Estruturar laboratório de informática",proj:"Awa",resp:"Jess Guin",       ini:"2026-03-23",fim:"TBD",        st:"Em Andamento",pk:"i-Awa-83",   grp:"i-Awa-94"},
-{r:95, lv:4,sec:"imp",item:"Validação dos equipamentos a serem doados",proj:"Awa",resp:"Alice",       ini:"2026-03-23",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-94",   grp:"i-Awa-94"},
-{r:96, lv:4,sec:"imp",item:"Recebimento de plano de melhoria de infra.",proj:"Awa",resp:"Jess Guin",  ini:"2026-04-06",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-94",   grp:"i-Awa-94"},
-{r:97, lv:4,sec:"imp",item:"Validação do plano de melhoria de infra",proj:"Awa",resp:"Jess Guin",     ini:"2026-04-10",fim:"2026-04-17",st:"Não Iniciado", pk:"i-Awa-94",   grp:"i-Awa-94"},
-{r:98, lv:4,sec:"imp",item:"Implementação de melhorias",      proj:"Awa",     resp:"Jess Guin",       ini:"2026-04-17",fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-94",   grp:"i-Awa-94"},
+{r:95, lv:4,sec:"imp",item:"Validação dos equipamentos a serem doados",proj:"Awa",resp:"Jess Guin",       ini:"2026-03-23",fim:"2026-04-17",st:"Em Andamento",pk:"i-Awa-94",   grp:"i-Awa-94"},
+{r:96, lv:4,sec:"imp",item:"Acompanhar recebimento de plano de melhoria de infra.",proj:"Awa",resp:"Jess Guin",  ini:"2026-04-06",fim:"2026-04-24",st:"Em Andamento",pk:"i-Awa-94",   grp:"i-Awa-94"},
+{r:97, lv:4,sec:"imp",item:"Validação do plano de melhoria de infra",proj:"Awa",resp:"Jess Guin",     ini:"2026-04-27",fim:"2026-05-01",st:"Não Iniciado", pk:"i-Awa-94",   grp:"i-Awa-94"},
+{r:98, lv:4,sec:"imp",item:"Implementação de melhorias",      proj:"Awa",     resp:"Jess Guin",       ini:"2026-05-01",fim:"2026-06-30",        st:"Não Iniciado", pk:"i-Awa-94",   grp:"i-Awa-94"},
 {r:99, lv:3,sec:"imp",item:"Elaboração de Plano de Gestão de Recursos",proj:"Awa",resp:"Jess Guin",   ini:"2026-03-30",fim:"2026-06-29",st:"Em Andamento",pk:"i-Awa-83",   grp:"i-Awa-99"},
-{r:100,lv:4,sec:"imp",item:"Assinatura de contrato",          proj:"Awa",     resp:"Jess Guin",       ini:"2026-03-30",fim:"2026-04-10",st:"Em Andamento",pk:"i-Awa-99",   grp:"i-Awa-99"},
-{r:101,lv:4,sec:"imp",item:"Análise prévia — suporte p/ plano",proj:"Awa",    resp:"Fabiano",         ini:"2026-04-10",fim:"2026-05-10",st:"Não Iniciado", pk:"i-Awa-99",   grp:"i-Awa-99"},
-{r:102,lv:4,sec:"imp",item:"Planejamento de logística p/ campo",proj:"Awa",   resp:"Jess Guin",       ini:"2026-04-10",fim:"2026-05-25",st:"Não Iniciado", pk:"i-Awa-99",   grp:"i-Awa-99"},
+{r:100,lv:4,sec:"imp",item:"Assinatura de contrato",          proj:"Awa",     resp:"Jess Guin",       ini:"2026-03-30",fim:"2026-04-10",st:"Concluído",pk:"i-Awa-99",   grp:"i-Awa-99"},
+{r:101,lv:4,sec:"imp",item:"Análise prévia — Suporte para construção de plano",proj:"Awa",    resp:"Fabiano",         ini:"2026-04-10",fim:"2026-05-10",st:"Em Andamento", pk:"i-Awa-99",   grp:"i-Awa-99"},
+{r:102,lv:4,sec:"imp",item:"Planejamento de logística p/ campo",proj:"Awa",   resp:"Jess Guin",       ini:"2026-04-10",fim:"2026-05-25",st:"Em Andamento", pk:"i-Awa-99",   grp:"i-Awa-99"},
 {r:103,lv:4,sec:"imp",item:"Implementação das oficinas (mín. 3 dias)",proj:"Awa",resp:"Jess Guin",    ini:"2026-05-25",fim:"2026-05-29",st:"Não Iniciado", pk:"i-Awa-99",   grp:"i-Awa-99"},
 {r:104,lv:4,sec:"imp",item:"Recebimento do relatório",        proj:"Awa",     resp:"Jess Guin",       ini:"2026-05-29",fim:"2026-06-29",st:"Não Iniciado", pk:"i-Awa-99",   grp:"i-Awa-99"},
 {r:105,lv:3,sec:"imp",item:"Confirmação da instalação de placas",proj:"Awa",  resp:"Jess Guin",       ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"i-Awa-83",  grp:"i-Awa-83"},
 
 // ─── ESTRUTURAÇÃO DA TRANSIÇÃO ──────────────
 {r:108,lv:2,sec:"est",item:"Refinamento de produto e processos",proj:"Todos",  resp:"Alice",          ini:"2026-04-01",fim:"2026-05-31",st:"Em Andamento",pk:"",           grp:"e-108"},
-{r:109,lv:3,sec:"est",item:"Workshop — Disponibilização da estrutura",proj:"Todos",resp:"David",      ini:"2026-04-08",fim:"2026-04-08",st:"Em Andamento",pk:"e-108",      grp:"e-108",ws:true},
-{r:110,lv:3,sec:"est",item:"Refinamento dos indicadores do menú",proj:"Todos", resp:"Jess Guin",      ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-108",      grp:"e-110",
+{r:109,lv:3,sec:"est",item:"Workshop — Disponibilização da estrutura",proj:"Todos",resp:"David",      ini:"2026-04-08",fim:"2026-04-08",st:"Concluído",pk:"e-108",      grp:"e-108",ws:true},
+{r:110,lv:3,sec:"est",item:"Refinamento dos indicadores do menú",proj:"Todos", resp:"Jess Guin",      ini:"2026-04-01",fim:"2026-04-08",st:"Concluído",pk:"e-108",      grp:"e-110",
   obj:"Refinar os indicadores aplicáveis de forma padronizada para cada um dos escopos, baseado no mapeamento feito com AI."},
-{r:111,lv:4,sec:"est",item:"Refinamento dos indicadores de Biodiversidade",proj:"Todos",resp:"Priscila",ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-110",  grp:"e-110"},
-{r:112,lv:4,sec:"est",item:"Refinamento dos indicadores de Comunidade",proj:"Todos",resp:"Lorena",     ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-110",     grp:"e-110"},
-{r:113,lv:4,sec:"est",item:"Refinamento dos indicadores de Clima",proj:"Todos",resp:"Costa",           ini:"2026-04-01",fim:"2026-04-08",st:"Em Andamento",pk:"e-110",     grp:"e-110"},
-{r:114,lv:3,sec:"est",item:"Workshop — Indicadores Estruturados",proj:"Todos", resp:"David",           ini:"2026-04-14",fim:"2026-04-14",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
-{r:115,lv:3,sec:"est",item:"Workshop — Matriz de Riscos",     proj:"Todos",    resp:"David",           ini:"2026-04-15",fim:"2026-04-15",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
-{r:116,lv:3,sec:"est",item:"Estruturação de matriz de risco por atividade",proj:"Todos",resp:"Costa",  ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"e-108",     grp:"e-108",
+{r:111,lv:4,sec:"est",item:"Refinamento dos indicadores de Biodiversidade",proj:"Todos",resp:"Priscila",ini:"2026-04-01",fim:"2026-04-08",st:"Concluído",pk:"e-110",  grp:"e-110"},
+{r:112,lv:4,sec:"est",item:"Refinamento dos indicadores de Comunidade",proj:"Todos",resp:"Lorena",     ini:"2026-04-01",fim:"2026-04-08",st:"Concluído",pk:"e-110",     grp:"e-110"},
+{r:113,lv:4,sec:"est",item:"Refinamento dos indicadores de Clima",proj:"Todos",resp:"Costa",           ini:"2026-04-01",fim:"2026-04-08",st:"Concluído",pk:"e-110",     grp:"e-110"},
+{r:114,lv:3,sec:"est",item:"Workshop — Indicadores Estruturados",proj:"Todos", resp:"David",           ini:"2026-04-14",fim:"2026-04-24",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
+{r:115,lv:3,sec:"est",item:"Workshop — Matriz de Riscos",     proj:"Todos",    resp:"David",           ini:"2026-04-14",fim:"2026-04-24",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
+{r:116,lv:3,sec:"est",item:"Estruturação de matriz de risco por atividade",proj:"Todos",resp:"Costa",  ini:"2026-04-06",fim:"2026-04-17",st:"Em Andamento",pk:"e-108",     grp:"e-108",
   obj:"Criar um menú de possíveis riscos ambientais, sociais, reputacionais, etc., vinculados à execução de atividades de projeto, junto com ações de mitigação e controle, em resposta ao requisito do VCS 5.0."},
 {r:117,lv:3,sec:"est",item:"Revisão da matriz de risco dos projetos",proj:"Todos",resp:"Jess Guin",    ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-108",     grp:"e-117",
   obj:"Revisão e atualização da matriz de risco do projeto e estruturação do fluxo dentro da plataforma."},
 {r:118,lv:4,sec:"est",item:"Revisão da estrutura da Matriz a ser replicada",proj:"Todos",resp:"Jess Guin, Costa",ini:"2026-04-13",fim:"2026-04-17",st:"Não Iniciado",pk:"e-117",grp:"e-117"},
-{r:119,lv:4,sec:"est",item:"Revisão da matriz do Awa",        proj:"Awa",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:120,lv:4,sec:"est",item:"Revisão da matriz do Ybyra",      proj:"Ybyra",   resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:121,lv:4,sec:"est",item:"Revisão da matriz do Ahu",        proj:"Ahu",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:122,lv:4,sec:"est",item:"Revisão da matriz do Angelim",    proj:"Angelim", resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:123,lv:4,sec:"est",item:"Revisão da matriz do Hiwi",       proj:"Hiwi",    resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:124,lv:4,sec:"est",item:"Revisão da matriz do Oga",        proj:"Oga",     resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:125,lv:4,sec:"est",item:"Revisão da matriz do Tatuy",      proj:"Tatuy",   resp:"Costa",            ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
-{r:126,lv:3,sec:"est",item:"Revisão canal comunicação e recebimento de queixas",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-108",grp:"e-126",
+{r:119,lv:4,sec:"est",item:"Revisão da matriz do Awa",        proj:"Awa",     resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:120,lv:4,sec:"est",item:"Revisão da matriz do Ybyra",      proj:"Ybyra",   resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:121,lv:4,sec:"est",item:"Revisão da matriz do Ahu",        proj:"Ahu",     resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:122,lv:4,sec:"est",item:"Revisão da matriz do Angelim",    proj:"Angelim", resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:123,lv:4,sec:"est",item:"Revisão da matriz do Hiwi",       proj:"Hiwi",    resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:124,lv:4,sec:"est",item:"Revisão da matriz do Oga",        proj:"Oga",     resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:125,lv:4,sec:"est",item:"Revisão da matriz do Tatuy",      proj:"Tatuy",   resp:"Costa",            ini:"2026-04-20",fim:"2026-04-30",st:"Não Iniciado", pk:"e-117",     grp:"e-117"},
+{r:126,lv:3,sec:"est",item:"Revisão de canal de comunicação e recebimento de queixas",proj:"Todos",resp:"Ricarla",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-108",grp:"e-126",
   obj:"Revisão do P.O. de canal de comunicação em resposta ao VCS 5.0, junto com uma proposta de fluxo para jornada do proprietário."},
-{r:127,lv:4,sec:"est",item:"Revisão e ajuste do P.O. do canal de comunicação",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-126",grp:"e-126"},
-{r:128,lv:4,sec:"est",item:"Construção de proposta de fluxo para jornada do proprietário",proj:"Todos",resp:"Ricarla, Lana",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-126",grp:"e-126"},
+{r:127,lv:4,sec:"est",item:"Revisão e ajuste do P.O. do canal de comunicação",proj:"Todos",resp:"Ricarla",ini:"2026-04-13",fim:"2026-05-01",st:"Não Iniciado",pk:"e-126",grp:"e-126"},
+{r:128,lv:4,sec:"est",item:"Construção de proposta de fluxo para jornada do proprietário",proj:"Todos",resp:"Ricarla",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-126",grp:"e-126"},
 {r:129,lv:3,sec:"est",item:"Refinamento da aplicação do menú aos projetos",proj:"Todos",resp:"Jess Guin",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-108",grp:"e-129",
   obj:"Validação da aplicação dos níveis baseada no mapeamento feito com AI, com o objetivo de ajustar e melhorar o fluxo de classificação e critérios de seleção de atividades para a plataforma."},
-{r:130,lv:4,sec:"est",item:"Validação escopos de Biodiversidade",proj:"Todos",resp:"Priscila",          ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
-{r:131,lv:4,sec:"est",item:"Validação escopos de Comunidade",proj:"Todos",    resp:"Lorena",            ini:"2026-04-13",fim:"2026-05-15",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
-{r:132,lv:4,sec:"est",item:"Validação escopos de Clima",      proj:"Todos",    resp:"Costa",             ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
+{r:130,lv:4,sec:"est",item:"Refinamento de aplicação do Menú (Biodiversidade)",proj:"Todos",resp:"Priscila",          ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
+{r:131,lv:4,sec:"est",item:"Refinamento de aplicação do Menú (Comunidade)",proj:"Todos",    resp:"Lorena",            ini:"2026-04-13",fim:"2026-05-15",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
+{r:132,lv:4,sec:"est",item:"Refinamento de aplicação do Menú (Clima)",      proj:"Todos",    resp:"Costa",             ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-129",     grp:"e-129"},
 {r:133,lv:4,sec:"est",item:"Definição de ajustes no fluxo de classificação e seleção",proj:"Todos",resp:"Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"e-129",grp:"e-129"},
 {r:134,lv:3,sec:"est",item:"Definição de fluxo de implementação de atividades",proj:"Todos",resp:"Lana, Mari",ini:"2026-04-03",fim:"2026-04-17",st:"Em Andamento",pk:"e-108",grp:"e-108",
   obj:"Construção de jornada do proprietário facilitando a implementação de ações e coleta de evidências."},
-{r:135,lv:3,sec:"est",item:"Workshop — Aplicação dos critérios",proj:"Todos",  resp:"David",            ini:"2026-04-16",fim:"2026-04-16",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
+{r:135,lv:3,sec:"est",item:"Workshop — Aplicação dos critérios",proj:"Todos",  resp:"David",            ini:"2026-04-16",fim:"2026-04-30",st:"Não Iniciado", pk:"e-108",     grp:"e-108",ws:true},
 {r:136,lv:3,sec:"est",item:"Adequação à VCS 5.0",             proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-15",st:"Não Iniciado", pk:"e-108",     grp:"e-136",
   obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação do VCS 5.0, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
 {r:137,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"Mari",ini:"2026-04-13",fim:"2026-05-15",st:"Não Iniciado",pk:"e-136",grp:"e-136"},
 {r:138,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-15",st:"Não Iniciado", pk:"e-136",     grp:"e-136"},
 {r:139,lv:3,sec:"est",item:"Adequação à Conservation Standards 5.0",proj:"Todos",resp:"Mari",            ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-108",     grp:"e-139",
   obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação do CS 5.0, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
-{r:140,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"TBD",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-139",grp:"e-139"},
-{r:141,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"TBD",               ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-139",     grp:"e-139"},
+{r:140,lv:4,sec:"est",item:"Definição de processos a serem ajustados/implementados",proj:"Todos",resp:"Mari A.",ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado",pk:"e-139",grp:"e-139"},
+{r:141,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"Mari A.",               ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-139",     grp:"e-139"},
 {r:142,lv:3,sec:"est",item:"Adequação à VM0048",              proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-108",     grp:"e-142",
   obj:"Identificar e construir de forma proativa as ferramentas necessárias para implementação da VM0048, trazendo uma proposta de ajuste para a plataforma, caso necessário."},
 {r:143,lv:4,sec:"est",item:"Draft dos novos fluxos",          proj:"Todos",    resp:"Mari",              ini:"2026-04-13",fim:"2026-05-31",st:"Não Iniciado", pk:"e-142",     grp:"e-142"},
@@ -536,10 +632,10 @@ const T=[
 {r:153,lv:3,sec:"est",item:"Acompanhamento do VVB Review",    proj:"Todos",    resp:"Jess Guin",           ini:"TBD",        fim:"TBD",        st:"Não Iniciado", pk:"e-148",     grp:"e-148"},
 
 // ─── TRANSIÇÃO PARA PLATAFORMA ───────────────
-{r:156,lv:2,sec:"plat",item:"Construção do material de onboarding",proj:"Todos",resp:"Lana",             ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"",           grp:"p-156",
+{r:156,lv:2,sec:"plat",item:"Construção do material de onboarding",proj:"Todos",resp:"Lana",             ini:"2026-04-13",fim:"2026-04-30",st:"Em Andamento",pk:"",           grp:"p-156",
   obj:"Construção de material dinâmico que facilite o processo de onboarding para a equipe do Proprietário."},
-{r:157,lv:3,sec:"plat",item:"O que é REDD?",                  proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"p-156",      grp:"p-156"},
-{r:158,lv:3,sec:"plat",item:"Comportamento em campo",         proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-06",fim:"2026-04-30",st:"Em Andamento",pk:"p-156",      grp:"p-156"},
+{r:157,lv:3,sec:"plat",item:"O que é REDD?",                  proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-156",      grp:"p-156"},
+{r:158,lv:3,sec:"plat",item:"Comportamento em campo",         proj:"Todos",    resp:"Lana, Andressa",    ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-156",      grp:"p-156"},
 {r:159,lv:3,sec:"plat",item:"Regras VCS e CCB (evidências)",  proj:"Todos",    resp:"Lana, Andressa, Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-156",grp:"p-156"},
 {r:160,lv:3,sec:"plat",item:"Compliance",                     proj:"Todos",    resp:"Lana, Andressa, Juridico",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-156",grp:"p-156"},
 {r:161,lv:3,sec:"plat",item:"Riscos",                         proj:"Todos",    resp:"Lana, Andressa, Jess Guin",ini:"2026-04-13",fim:"2026-04-30",st:"Não Iniciado",pk:"p-156",grp:"p-156"},
@@ -884,11 +980,121 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('scroll',hideObj,true);
 
+
+// ═══════════════════════════════════════════
+// RESUMO MODAL
+// ═══════════════════════════════════════════
+function toggleResumo(){
+  const overlay = document.getElementById('resumo-overlay');
+  const open = overlay.classList.toggle('visible');
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') { const o=document.getElementById('resumo-overlay'); if(o.classList.contains('visible')) toggleResumo(); }});
+
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
 renderProg();
 renderBlocks(T);
 </script>
+
+<!-- RESUMO MODAL -->
+<div class="resumo-overlay" id="resumo-overlay" onclick="if(event.target===this)toggleResumo()">
+  <div class="resumo-modal">
+    <div class="resumo-header">
+      <div>
+        <div class="resumo-title">📋 Resumo da Semana</div>
+        <div class="resumo-subtitle">Semana de 13/abr/2026 · Atualizado via JIRA TRD</div>
+      </div>
+      <button class="resumo-close" onclick="toggleResumo()">✕</button>
+    </div>
+    <div class="resumo-body">
+
+      <div class="resumo-section">
+        <div class="resumo-sec-title rs-green">🟢 Avanços confirmados</div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#2d8a50"></div>
+          <div><b>Hiwi MR2 encerrado.</b> Confirmação de verificação concluída no JIRA. O ciclo do MR2 está oficialmente fechado — time já operando em MR3.<div class="sub">TRD-361 Concluído · TRD-445 Envio PRR ao VVB Concluído</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#2d8a50"></div>
+          <div><b>Ybyra: todos os 6 findings concluídos.</b> Resposta ao VVB finalizada. Pronto para Technical Review VVB (13–17/abr).<div class="sub">TRD-345 a TRD-350 todos Concluídos · TRD-351 Envio VVB Concluído</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#2d8a50"></div>
+          <div><b>Tatuy — Avaliação de Fechamento MR2 concluída.</b> Validação de evidências e avaliação de ações finalizadas. Projeto sai da fase de avaliação.<div class="sub">TRD-367 e TRD-368 Concluídos</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#2d8a50"></div>
+          <div><b>Estruturação — 1º ciclo de refinamentos concluído.</b> Workshop de disponibilização, refinamento de todos os indicadores (Bio, Comunidade, Clima) — todos Concluídos.<div class="sub">TRD-393 a TRD-397 Concluídos</div></div>
+        </div>
+      </div>
+
+      <div class="resumo-section">
+        <div class="resumo-sec-title rs-amber">🟡 Atenção — marcos revisados</div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#d4a843"></div>
+          <div><b>Hiwi MR3 atrasou ~9 dias.</b> Ajustes ao MR3 ainda em andamento (prazo 15/abr). Com isso, a cadeia toda se deslocou: Technical Review 20–24/abr, Revisão ValR/VerR 27–29/abr, Submissão ao Verra que era 20/abr agora está 29/abr–01/mai.<div class="sub">TRD-362 Em Andamento · TRD-363/364/365 datas revisadas</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#d4a843"></div>
+          <div><b>Oga — 6 findings ainda em andamento, prazo prorrogado para 15/abr.</b> Technical Review VVB já em curso em paralelo (8–22/abr). Submissão ao Verra em 24/abr depende do fechamento desses findings.<div class="sub">TRD-304, 307, 308, 309, 310, 311 Em Andamento</div></div>
+        </div>
+        <div class="resumo-item">
+          <div class="resumo-dot" style="background:#d4a843"></div>
+          <div><b>Angelim — Avaliação de Fechamento MR2 estendida até 08/mai.</b> Articulação com proprietário em andamento (13–24/abr). Validação de evidências e avaliação de ações só iniciam em 27/abr.<div class="sub">TRD-369 Em Andamento · TRD-370/371 deslocadas</div></div>
+        </div>
+      </div>
+
+      <div class="resumo-section">
+        <div class="resumo-sec-title rs-blue">🔵 Próximos marcos críticos</div>
+        <div class="resumo-marcos">
+          <div class="resumo-marco-row">
+            <span class="rmr-date">15/abr</span>
+            <span class="rmr-proj rmr-hot">Oga</span>
+            <span>Prazo final dos 6 findings em aberto ← <b>esta semana</b></span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">13–17/abr</span>
+            <span class="rmr-proj rmr-hot">Ybyra</span>
+            <span>Technical Review VVB ← <b>esta semana</b></span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">15/abr</span>
+            <span class="rmr-proj rmr-hot">Hiwi</span>
+            <span>Coordenar ajustes ao MR3 ← <b>esta semana</b></span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">16/abr</span>
+            <span class="rmr-proj rmr-warn">Estrut.</span>
+            <span>Workshop — Aplicação dos critérios</span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">22/abr</span>
+            <span class="rmr-proj rmr-warn">Ahu</span>
+            <span>Technical Review VVB — prazo final</span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">24/abr</span>
+            <span class="rmr-proj rmr-warn">Oga</span>
+            <span>Submissão ao Verra (depende do fechamento dos findings)</span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">20–24/abr</span>
+            <span class="rmr-proj rmr-warn">Hiwi</span>
+            <span>Technical Review VVB MR3</span>
+          </div>
+          <div class="resumo-marco-row">
+            <span class="rmr-date">29/abr–01/mai</span>
+            <span class="rmr-proj rmr-warn">Hiwi</span>
+            <span>Submissão ao Verra MR3 (revisado)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
